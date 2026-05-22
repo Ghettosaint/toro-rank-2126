@@ -1,0 +1,10 @@
+# misc
+.DS_Store
+Thumbs.db
+
+# editor
+*.swp
+*.swo
+
+# env files
+.env

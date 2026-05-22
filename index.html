@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A dark static frontend template that fetches live data from an external API using plain HTML, CSS, and JavaScript."
+    />
+    <meta name="theme-color" content="#0b0d12" />
+    <title>Static API Frontend Template</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0d12'/%3E%3Ccircle cx='32' cy='32' r='10' fill='%23f5f7fb'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="#top" aria-label="Static API frontend home">
+          <span class="brand-mark"></span>
+          <span>Static API Frontend</span>
+        </a>
+        <span class="header-badge">Static</span>
+      </header>
+
+      <main id="top">
+        <section class="hero section reveal">
+          <div class="hero-copy">
+            <h1>This frontend can call external APIs just like any modern app.</h1>
+            <p class="hero-kicker">
+              This frontend is deployed on a blockchain network across 14
+              independent nodes &mdash; and you couldn't even tell.
+            </p>
+            <p class="hero-text">
+              Deployed with modern distributed technologies, it still behaves
+              like a normal frontend and can fetch live data from external
+              services without limitations.
+            </p>
+            <div class="hero-actions">
+              <button class="button button-primary js-fetch-trigger" type="button">
+                Fetch data
+              </button>
+              <a class="button button-secondary" href="#demo">View live demo</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="demo" class="section reveal">
+          <div class="section-heading">
+            <h2>Live API demo</h2>
+            <p>Public API request with native <code>fetch()</code>.</p>
+          </div>
+
+          <div class="demo-grid">
+            <div class="panel demo-controls">
+              <button
+                id="fetchButton"
+                class="button button-primary button-wide js-fetch-trigger"
+                type="button"
+              >
+                Fetch data
+              </button>
+              <p id="statusMessage" class="status-message" aria-live="polite">
+                Ready.
+              </p>
+            </div>
+
+            <div id="responseCard" class="panel response-card" data-state="idle">
+              <div class="response-header">
+                <span class="response-badge">API response</span>
+                <span id="responseMeta" class="response-meta">Waiting</span>
+              </div>
+              <div id="responseContent" class="response-content" aria-live="polite">
+                <div class="empty-state">
+                  <p class="empty-title">No data loaded yet</p>
+                  <p>Fetch data to see the response.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <noscript>
+            <p class="noscript-note">
+              JavaScript is required to run the API demo.
+            </p>
+          </noscript>
+        </section>
+
+        <section class="section features reveal">
+          <div class="section-heading">
+            <h2>Features</h2>
+          </div>
+
+          <div class="feature-grid">
+            <article class="panel feature-card">
+              <h3>Works like any frontend</h3>
+              <p>Runs in the browser and calls external APIs directly.</p>
+            </article>
+
+            <article class="panel feature-card">
+              <h3>No backend required</h3>
+              <p>HTML, CSS, and JavaScript are enough for this setup.</p>
+            </article>
+
+            <article class="panel feature-card">
+              <h3>Globally accessible</h3>
+              <p>Deploy the same static files anywhere.</p>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>Plain HTML, CSS, and JavaScript.</p>
+        <p>Ready for static hosting.</p>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
