@@ -1,150 +1,117 @@
+/*
+ * TORO RANK 2126 — boot sequence + reveal animations.
+ *
+ * No build, no modules. Single script for the static A3 deploy.
+ * Keeps the accessibility patterns from the original A3 starter:
+ *   - body.js-ready class so non-JS users see content immediately
+ *   - prefers-reduced-motion is respected throughout
+ *   - IntersectionObserver for scroll reveals
+ */
+
 document.body.classList.add("js-ready");
 
-const demoSection = document.getElementById("demo");
-const fetchButtons = document.querySelectorAll(".js-fetch-trigger");
-const responseCard = document.getElementById("responseCard");
-const responseContent = document.getElementById("responseContent");
-const responseMeta = document.getElementById("responseMeta");
-const statusMessage = document.getElementById("statusMessage");
-const revealItems = document.querySelectorAll(".reveal");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-let activeController = null;
+/* -------------------------------------------------------------
+ * Boot sequence
+ *
+ * Types out a few terminal-style lines, then fades in the hero.
+ * The lines themselves are inserted dynamically — the <noscript>
+ * inside .boot__lines is the no-JS fallback shown to crawlers.
+ * ------------------------------------------------------------- */
 
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (character) => {
-    const entities = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-    };
+const BOOT_LINES = [
+  "> establishing uplink to TORO RANK node :: 2126",
+  "> handshake :: schema.org / mcp / a2a",
+  "> consultant online.",
+];
 
-    return entities[character] || character;
-  });
+const BOOT_CHAR_MS = 18;        // ms per character typed
+const BOOT_LINE_PAUSE_MS = 240; // pause between lines
+
+const bootContainer = document.querySelector(".boot__lines");
+const bootTitle = document.querySelector(".boot__title");
+const bootSubtitle = document.querySelector(".boot__subtitle");
+const bootCta = document.querySelector(".boot__cta");
+
+/**
+ * Reveal hero copy. Called after the boot sequence finishes,
+ * or immediately if the user prefers reduced motion.
+ */
+function revealHero() {
+  bootTitle?.classList.add("boot__title--ready");
+  bootSubtitle?.classList.add("boot__subtitle--ready");
+  bootCta?.classList.add("boot__cta--ready");
 }
 
-function formatTimestamp(date) {
-  return new Intl.DateTimeFormat(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-  }).format(date);
-}
+/**
+ * Type a single boot line character-by-character.
+ * Returns a Promise that resolves once the line is fully typed.
+ *
+ * @param {string} text - The full line to type.
+ * @param {boolean} isLast - If true, keep the blinking cursor on this line.
+ */
+function typeLine(text, isLast) {
+  return new Promise((resolve) => {
+    const span = document.createElement("span");
+    span.className = "boot__line";
+    if (isLast) span.classList.add("boot__line--current");
+    bootContainer.appendChild(span);
 
-function setButtonsDisabled(disabled) {
-  fetchButtons.forEach((button) => {
-    button.disabled = disabled;
-    button.setAttribute("aria-busy", String(disabled));
-  });
-}
-
-function renderLoading() {
-  responseCard.dataset.state = "loading";
-  responseMeta.textContent = "Loading";
-  statusMessage.textContent = "Loading...";
-  responseContent.innerHTML = `
-    <div class="loading-state">
-      <div class="loading-spinner" aria-hidden="true"></div>
-      <div>
-        <p class="empty-title">Loading data</p>
-      </div>
-    </div>
-  `;
-}
-
-function renderResult(post, requestTime) {
-  responseCard.dataset.state = "success";
-  responseMeta.textContent = `Loaded at ${formatTimestamp(requestTime)}`;
-  statusMessage.textContent = `Loaded post ${post.id}.`;
-  responseContent.innerHTML = `
-    <article class="response-body">
-      <h3 class="response-title">${escapeHtml(post.title)}</h3>
-      <p class="response-copy">${escapeHtml(post.body)}</p>
-      <ul class="response-tags">
-        <li>Post ${post.id}</li>
-        <li>User ${post.userId}</li>
-        <li>JSONPlaceholder</li>
-      </ul>
-    </article>
-  `;
-}
-
-function renderError(message) {
-  responseCard.dataset.state = "error";
-  responseMeta.textContent = "Error";
-  statusMessage.textContent = "Request failed.";
-  responseContent.innerHTML = `
-    <div class="error-state">
-      <div>
-        <p class="error-title">Unable to load data</p>
-        <p>${escapeHtml(message)}</p>
-      </div>
-    </div>
-  `;
-}
-
-async function fetchDemoData({ scrollIntoView = false } = {}) {
-  if (scrollIntoView) {
-    demoSection.scrollIntoView({
-      behavior: prefersReducedMotion ? "auto" : "smooth",
-      block: "start",
-    });
-  }
-
-  if (activeController) {
-    activeController.abort();
-  }
-
-  const controller = new AbortController();
-  activeController = controller;
-  const postId = Math.floor(Math.random() * 100) + 1;
-
-  setButtonsDisabled(true);
-  renderLoading();
-
-  try {
-    const response = await fetch(
-      `https://jsonplaceholder.typicode.com/posts/${postId}`,
-      {
-        signal: controller.signal,
-        headers: {
-          Accept: "application/json",
-        },
+    let i = 0;
+    const tick = () => {
+      span.textContent = text.slice(0, i);
+      i += 1;
+      if (i <= text.length) {
+        setTimeout(tick, BOOT_CHAR_MS);
+      } else {
+        resolve();
       }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}.`);
-    }
-
-    const post = await response.json();
-
-    if (controller !== activeController) {
-      return;
-    }
-
-    renderResult(post, new Date());
-  } catch (error) {
-    if (error.name === "AbortError") {
-      return;
-    }
-
-    renderError(
-      error instanceof Error
-        ? error.message
-        : "An unexpected error occurred while loading the API response."
-    );
-  } finally {
-    if (controller === activeController) {
-      activeController = null;
-      setButtonsDisabled(false);
-    }
-  }
+    };
+    tick();
+  });
 }
 
+async function runBootSequence() {
+  if (!bootContainer) {
+    // Defensive — if the markup ever changes, still reveal the hero.
+    revealHero();
+    return;
+  }
+
+  // Clear the <noscript> fallback now that we know JS is running.
+  bootContainer.innerHTML = "";
+
+  if (prefersReducedMotion) {
+    // Show every line at once — no typing animation.
+    BOOT_LINES.forEach((line) => {
+      const span = document.createElement("span");
+      span.className = "boot__line";
+      span.textContent = line;
+      bootContainer.appendChild(span);
+    });
+    revealHero();
+    return;
+  }
+
+  for (let i = 0; i < BOOT_LINES.length; i++) {
+    const isLast = i === BOOT_LINES.length - 1;
+    await typeLine(BOOT_LINES[i], isLast);
+    await new Promise((r) => setTimeout(r, BOOT_LINE_PAUSE_MS));
+  }
+
+  revealHero();
+}
+
+/* -------------------------------------------------------------
+ * Section reveal on scroll
+ *
+ * Kept from the A3 starter — IntersectionObserver pattern is
+ * lightweight and respects reduced-motion.
+ * ------------------------------------------------------------- */
 function setupRevealAnimations() {
+  const revealItems = document.querySelectorAll(".reveal");
+
   if (!("IntersectionObserver" in window) || prefersReducedMotion) {
     revealItems.forEach((item) => item.classList.add("is-visible"));
     return;
@@ -153,31 +120,19 @@ function setupRevealAnimations() {
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (!entry.isIntersecting) {
-          return;
-        }
-
+        if (!entry.isIntersecting) return;
         entry.target.classList.add("is-visible");
         observer.unobserve(entry.target);
       });
     },
-    {
-      threshold: 0.18,
-    }
+    { threshold: 0.18 }
   );
 
   revealItems.forEach((item) => observer.observe(item));
 }
 
-function bindEvents() {
-  fetchButtons.forEach((button) => {
-    const shouldScroll = button.closest(".hero") !== null;
-
-    button.addEventListener("click", () => {
-      fetchDemoData({ scrollIntoView: shouldScroll });
-    });
-  });
-}
-
+/* -------------------------------------------------------------
+ * Init
+ * ------------------------------------------------------------- */
+runBootSequence();
 setupRevealAnimations();
-bindEvents();

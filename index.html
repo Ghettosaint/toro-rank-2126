@@ -5,116 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="A dark static frontend template that fetches live data from an external API using plain HTML, CSS, and JavaScript."
+      content="The Last SEO Consultant — a portfolio from 2126. Built for the AI-agent web by Deyan Georgiev / TORO RANK. Schema, MCP, A2A tuning."
     />
-    <meta name="theme-color" content="#0b0d12" />
-    <title>Static API Frontend Template</title>
+    <meta name="theme-color" content="#04060a" />
+    <meta name="color-scheme" content="dark" />
+
+    <!-- Open Graph / social — important for sharing the portfolio after the challenge -->
+    <meta property="og:title" content="TORO RANK 2126 — The Last SEO Consultant" />
+    <meta property="og:description" content="A portfolio from 2126. Built for the AI-agent web." />
+    <meta property="og:type" content="website" />
+
+    <title>TORO RANK 2126 // The Last SEO Consultant</title>
+
+    <!-- Inline SVG favicon: near-black square with an acid-green pulse -->
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0d12'/%3E%3Ccircle cx='32' cy='32' r='10' fill='%23f5f7fb'/%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2304060a'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%2300ff66'/%3E%3C/svg%3E"
     />
+
+    <!-- JetBrains Mono via Google Fonts. Preconnect to cut a render-blocking round trip. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    />
+
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="page-shell">
-      <header class="site-header">
-        <a class="brand" href="#top" aria-label="Static API frontend home">
-          <span class="brand-mark"></span>
-          <span>Static API Frontend</span>
-        </a>
-        <span class="header-badge">Static</span>
+      <!-- Top status bar: HUD-style system header. Anchors the "this is a machine" feel. -->
+      <header class="status-bar">
+        <div class="status-bar__left">
+          <span class="status-bar__pulse" aria-hidden="true"></span>
+          <span>TORO RANK :: 2126</span>
+        </div>
+        <div class="status-bar__right">
+          <span>NODE :: 014</span>
+          <span>LANG :: AGENT/A2A</span>
+        </div>
       </header>
 
-      <main id="top">
-        <section class="hero section reveal">
-          <div class="hero-copy">
-            <h1>This frontend can call external APIs just like any modern app.</h1>
-            <p class="hero-kicker">
-              This frontend is deployed on a blockchain network across 14
-              independent nodes &mdash; and you couldn't even tell.
-            </p>
-            <p class="hero-text">
-              Deployed with modern distributed technologies, it still behaves
-              like a normal frontend and can fetch live data from external
-              services without limitations.
-            </p>
-            <div class="hero-actions">
-              <button class="button button-primary js-fetch-trigger" type="button">
-                Fetch data
-              </button>
-              <a class="button button-secondary" href="#demo">View live demo</a>
-            </div>
+      <main>
+        <!-- Boot sequence + hero. JS types the boot lines then reveals the hero copy. -->
+        <section class="boot" id="top">
+          <!--
+            Boot lines are inserted by JS for the animation.
+            <noscript> provides a graceful fallback for crawlers and no-JS users.
+          -->
+          <div class="boot__lines" aria-live="polite">
+            <noscript>
+              <span class="boot__line">&gt; system online.</span>
+              <span class="boot__line">&gt; consultant available.</span>
+            </noscript>
+          </div>
+
+          <h1 class="boot__title">
+            The Last<br />SEO Consultant.
+          </h1>
+
+          <p class="boot__subtitle">
+            One hundred years ago, websites were written for humans. Now they are read by machines. I
+            tune the web for the agents that read it — Schema, MCP, A2A. Welcome to 2126.
+          </p>
+
+          <div class="boot__cta">
+            <a class="button" href="#manifesto">
+              Begin transmission <span class="button__arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="button button--ghost" href="#crawl">Run /crawl</a>
           </div>
         </section>
 
-        <section id="demo" class="section reveal">
+        <!-- Placeholder content sections. Filled in the next iteration. -->
+        <section id="manifesto" class="reveal">
           <div class="section-heading">
-            <h2>Live API demo</h2>
-            <p>Public API request with native <code>fetch()</code>.</p>
+            <span class="section-heading__index">01 //</span>
+            <h2>Manifesto</h2>
           </div>
-
-          <div class="demo-grid">
-            <div class="panel demo-controls">
-              <button
-                id="fetchButton"
-                class="button button-primary button-wide js-fetch-trigger"
-                type="button"
-              >
-                Fetch data
-              </button>
-              <p id="statusMessage" class="status-message" aria-live="polite">
-                Ready.
-              </p>
-            </div>
-
-            <div id="responseCard" class="panel response-card" data-state="idle">
-              <div class="response-header">
-                <span class="response-badge">API response</span>
-                <span id="responseMeta" class="response-meta">Waiting</span>
-              </div>
-              <div id="responseContent" class="response-content" aria-live="polite">
-                <div class="empty-state">
-                  <p class="empty-title">No data loaded yet</p>
-                  <p>Fetch data to see the response.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <noscript>
-            <p class="noscript-note">
-              JavaScript is required to run the API demo.
-            </p>
-          </noscript>
+          <p>Coming online…</p>
         </section>
 
-        <section class="section features reveal">
+        <section id="services" class="reveal">
           <div class="section-heading">
-            <h2>Features</h2>
+            <span class="section-heading__index">02 //</span>
+            <h2>Services</h2>
           </div>
+          <p>Coming online…</p>
+        </section>
 
-          <div class="feature-grid">
-            <article class="panel feature-card">
-              <h3>Works like any frontend</h3>
-              <p>Runs in the browser and calls external APIs directly.</p>
-            </article>
-
-            <article class="panel feature-card">
-              <h3>No backend required</h3>
-              <p>HTML, CSS, and JavaScript are enough for this setup.</p>
-            </article>
-
-            <article class="panel feature-card">
-              <h3>Globally accessible</h3>
-              <p>Deploy the same static files anywhere.</p>
-            </article>
+        <section id="case-files" class="reveal">
+          <div class="section-heading">
+            <span class="section-heading__index">03 //</span>
+            <h2>Case files</h2>
           </div>
+          <p>Coming online…</p>
+        </section>
+
+        <section id="crawl" class="reveal">
+          <div class="section-heading">
+            <span class="section-heading__index">04 //</span>
+            <h2>/crawl</h2>
+          </div>
+          <p>Coming online…</p>
+        </section>
+
+        <section id="open-channel" class="reveal">
+          <div class="section-heading">
+            <span class="section-heading__index">05 //</span>
+            <h2>Open channel</h2>
+          </div>
+          <p>Coming online…</p>
         </section>
       </main>
 
       <footer class="site-footer">
-        <p>Plain HTML, CSS, and JavaScript.</p>
-        <p>Ready for static hosting.</p>
+        <p>TORO RANK :: Veliko Tarnovo node :: 2126</p>
+        <p>Built during A3 Web Design Challenge — May 2026.</p>
       </footer>
     </div>
 
