@@ -219,6 +219,32 @@ body[data-page="take-control"] .nav-menu__item[href="take-control.html"] {
   }
 }
 
+/*
+ * Landing pills on mobile — smaller, sit visually ABOVE the bull
+ * hands GLB (hands sit in the lower half of the canvas, pills get
+ * pushed up by adjusting flex justification on the parent).
+ */
+@media (max-width: 720px) {
+  .choice {
+    justify-content: flex-start;
+    padding-top: 2.5rem;
+  }
+  .choice__pills {
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .pill {
+    padding: 0.85rem 1.2rem;
+    min-width: 130px;
+  }
+  .pill__label {
+    font-size: 1.15rem;
+  }
+  .pill__sub {
+    font-size: 0.7rem;
+  }
+}
+
 /* Provenance page — about-style content section */
 body[data-page="provenance"] .nav-menu__item[href="provenance.html"] {
   color: var(--text-bright);

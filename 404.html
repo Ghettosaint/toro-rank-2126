@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="404 — this surface does not exist on the TORO RANK 2126 node. Follow the white rabbit back to the choice."
+    />
+    <meta name="theme-color" content="#010c05" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content="noindex" />
+
+    <title>TORO RANK 2126 // 404 — surface not found</title>
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23010c05'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%2300ff66'/%3E%3C/svg%3E"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <style>
+      /*
+       * 404 page — minimal cinematic moment. The white rabbit SVG is
+       * inline so the page is self-contained even if other assets fail.
+       */
+      .not-found {
+        min-height: 80vh;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 4rem 1rem;
+      }
+      .not-found__rabbit {
+        width: 140px;
+        height: auto;
+        margin: 0 auto 2.5rem;
+        filter: drop-shadow(0 0 18px rgba(232, 255, 232, 0.35));
+        animation: rabbitHop 2.4s ease-in-out infinite;
+      }
+      @keyframes rabbitHop {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+      .not-found__code {
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .not-found__title {
+        font-size: clamp(2rem, 6vw, 4rem);
+        color: var(--text-bright);
+        margin-bottom: 1.5rem;
+        line-height: 1;
+      }
+      .not-found__line {
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        max-width: 48ch;
+        margin: 0 auto 2.5rem;
+      }
+      .not-found__actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .not-found__rabbit { animation: none; }
+      }
+    </style>
+  </head>
+  <body data-page="404">
+    <div class="page-shell">
+      <header class="status-bar">
+        <div class="status-bar__left">
+          <span class="status-bar__pulse" aria-hidden="true"></span>
+          <a class="status-bar__link" href="index.html">TORO RANK :: 2126</a>
+        </div>
+        <div class="status-bar__right">
+          <span>NODE :: 014</span>
+          <span>STATUS :: 404</span>
+        </div>
+      </header>
+
+      <nav class="nav-menu" aria-label="Primary">
+        <a class="nav-menu__item" href="index.html">/</a>
+        <a class="nav-menu__item" href="agent.html">// agent</a>
+        <a class="nav-menu__item" href="crawl.html">// crawl</a>
+        <a class="nav-menu__item" href="provenance.html">// provenance</a>
+        <a class="nav-menu__item" href="take-control.html">// take control</a>
+      </nav>
+
+      <main class="not-found">
+        <div>
+          <!-- White rabbit — inline SVG, no external dependency -->
+          <svg
+            class="not-found__rabbit"
+            viewBox="0 0 120 160"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <!-- Ears -->
+            <ellipse cx="44" cy="30" rx="7" ry="22" fill="#e8ffe8" stroke="#00ff66" stroke-width="1.5" />
+            <ellipse cx="44" cy="30" rx="3" ry="16" fill="#021607" />
+            <ellipse cx="76" cy="30" rx="7" ry="22" fill="#e8ffe8" stroke="#00ff66" stroke-width="1.5" />
+            <ellipse cx="76" cy="30" rx="3" ry="16" fill="#021607" />
+            <!-- Head -->
+            <circle cx="60" cy="68" r="24" fill="#e8ffe8" stroke="#00ff66" stroke-width="1.5" />
+            <!-- Eyes — glowing green -->
+            <circle cx="51" cy="64" r="2.5" fill="#00ff66" />
+            <circle cx="69" cy="64" r="2.5" fill="#00ff66" />
+            <!-- Nose -->
+            <ellipse cx="60" cy="76" rx="2" ry="1.5" fill="#021607" />
+            <!-- Whiskers -->
+            <line x1="44" y1="76" x2="34" y2="74" stroke="#00ff66" stroke-width="1" />
+            <line x1="44" y1="78" x2="32" y2="80" stroke="#00ff66" stroke-width="1" />
+            <line x1="76" y1="76" x2="86" y2="74" stroke="#00ff66" stroke-width="1" />
+            <line x1="76" y1="78" x2="88" y2="80" stroke="#00ff66" stroke-width="1" />
+            <!-- Body -->
+            <ellipse cx="60" cy="118" rx="28" ry="22" fill="#e8ffe8" stroke="#00ff66" stroke-width="1.5" />
+            <!-- Feet -->
+            <ellipse cx="42" cy="142" rx="9" ry="5" fill="#e8ffe8" stroke="#00ff66" stroke-width="1.5" />
+            <ellipse cx="78" cy="142" rx="9" ry="5" fill="#e8ffe8" stroke="#00ff66" stroke-width="1.5" />
+            <!-- Tail puff -->
+            <circle cx="88" cy="115" r="6" fill="#e8ffe8" stroke="#00ff66" stroke-width="1.5" />
+          </svg>
+
+          <p class="not-found__code">ERROR :: 404 // SURFACE NOT FOUND</p>
+          <h1 class="not-found__title">You went too deep<br />into the rabbit hole.</h1>
+          <p class="not-found__line">
+            This address does not exist on the 2126 node. The agent looked. The crawler looked.
+            Nothing came back.
+          </p>
+
+          <div class="not-found__actions">
+            <a class="button" href="index.html">
+              <span class="control-form__submit-label">Follow the rabbit back</span>
+            </a>
+            <a class="button button--ghost" href="take-control.html">
+              Report the broken link
+            </a>
+          </div>
+        </div>
+      </main>
+
+      <footer class="site-footer">
+        <p>TORO RANK :: Veliko Tarnovo node :: 2126</p>
+        <p>Built during A3 Web Design Challenge — May 2026.</p>
+        <p>Built by Deyan Georgiev · <a href="https://tororank.com" target="_blank" rel="noopener">TORO RANK</a></p>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
