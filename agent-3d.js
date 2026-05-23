@@ -32,7 +32,7 @@ import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 //
 // Y = yaw (turn left/right), X = pitch (tilt up/down), Z = roll.
 // =============================================================
-const BULL_HEAD_ROT_X = 0;
+const BULL_HEAD_ROT_X = -Math.PI / 2;
 const BULL_HEAD_ROT_Y = 0;
 const BULL_HEAD_ROT_Z = 0;
 

@@ -274,7 +274,7 @@
   // Draw — lanes + entities + player + HUD
   // -----------------------------------------------------------
   function drawBackground() {
-    ctx.fillStyle = "#021a0c";
+    ctx.fillStyle = "#010c05";
     ctx.fillRect(0, 0, viewW, viewH);
 
     // Subtle vertical scroll grid (gives a sense of motion)
@@ -401,7 +401,7 @@
     drawBackground();
     drawLanes();
 
-    ctx.fillStyle = "rgba(2, 26, 12, 0.85)";
+    ctx.fillStyle = "rgba(1, 12, 5, 0.85)";
     ctx.fillRect(0, 0, viewW, viewH);
 
     ctx.textAlign = "center";

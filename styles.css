@@ -18,9 +18,9 @@
   color-scheme: dark;
 
   /* Background — very dark green tint (One Color rule: green dominates the canvas) */
-  --bg: #021a0c;
-  --surface: #082212;
-  --surface-strong: #0c2818;
+  --bg: #010c05;
+  --surface: #021607;
+  --surface-strong: #031c0a;
 
   /* Acid green — the one color */
   --green-100: #e8ffe8;
@@ -401,14 +401,14 @@ body[data-page="take-control"] .nav-menu__item[href="take-control.html"] {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 2rem 2.5rem;
+  padding: 1.4rem 2rem;
   border: 1px solid var(--border-strong);
-  background: rgba(2, 26, 12, 0.7);
+  background: rgba(1, 12, 5, 0.7);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   text-decoration: none;
   color: var(--text-bright);
-  min-width: 220px;
+  min-width: 170px;
   transition:
     transform var(--dur-med) var(--ease-out),
     border-color var(--dur-med) var(--ease-out),
@@ -426,14 +426,14 @@ body[data-page="take-control"] .nav-menu__item[href="take-control.html"] {
 }
 
 .pill__label {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.35rem;
 }
 
 .pill__sub {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -1010,7 +1010,7 @@ section {
  * ------------------------------------------------------------- */
 .crawl-stage {
   border: 1px solid var(--border-strong);
-  background: #021a0c;
+  background: #010c05;
   overflow: hidden;
   position: relative;
   /* Sized to give the game a cinematic widescreen feel */
@@ -1320,7 +1320,7 @@ section {
 .control-success {
   position: fixed;
   inset: 0;
-  background: rgba(2, 26, 12, 0.92);
+  background: rgba(1, 12, 5, 0.92);
   display: grid;
   place-items: center;
   z-index: 8000;

@@ -182,7 +182,7 @@ function createMatrixOverlay(initialOpacity) {
     "position: fixed",
     "inset: 0",
     "z-index: 9999",
-    "background: #021a0c",
+    "background: #010c05",
     `opacity: ${initialOpacity}`,
     "transition: opacity 220ms ease-out",
     "pointer-events: all",
@@ -217,7 +217,7 @@ function startMatrixRain(canvas) {
     if (cancelled) return;
 
     // Semi-transparent layer creates the fading trail effect
-    ctx.fillStyle = "rgba(2, 26, 12, 0.08)";
+    ctx.fillStyle = "rgba(1, 12, 5, 0.08)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     for (let i = 0; i < drops.length; i++) {
