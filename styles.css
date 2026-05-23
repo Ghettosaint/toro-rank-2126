@@ -501,9 +501,20 @@ code,
   min-height: 60vh;
 }
 
+/*
+ * Grid items must allow shrinking — otherwise the huge h1 forces
+ * the copy column to expand past its 1.1fr allocation and the
+ * visual column collapses below the text. min-width: 0 fixes the
+ * default min-width: auto on grid children.
+ */
+.agent-hero__copy,
+.agent-hero__visual {
+  min-width: 0;
+}
+
 .agent-hero__visual {
   position: relative;
-  min-height: 420px;
+  min-height: 480px;
   height: 100%;
 }
 
@@ -645,6 +656,22 @@ section {
   color: var(--text-muted);
   letter-spacing: 0.15em;
   text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  position: relative;
+}
+
+/* Pulsing LED dot before each section index — feels like a live signal */
+.section-heading__index::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green-500);
+  box-shadow: var(--glow-sm);
+  animation: pulse 1.8s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
 /* -------------------------------------------------------------
@@ -685,11 +712,13 @@ section {
   padding: 1.8rem 1.6rem;
   transition:
     border-color var(--dur-fast) var(--ease-out),
-    box-shadow var(--dur-fast) var(--ease-out);
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
 }
 
 .service {
   position: relative;
+  transform-origin: center bottom;
 }
 
 /*
@@ -731,7 +760,10 @@ section {
 
 .service:hover {
   border-color: var(--green-500);
-  box-shadow: var(--glow-sm);
+  transform: translateY(-5px);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.4),
+    0 0 24px rgba(0, 255, 102, 0.2);
 }
 
 .service__index {
@@ -975,6 +1007,109 @@ section {
 .js-ready .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* -------------------------------------------------------------
+ * Agent page ambient decorations
+ *
+ * Vertical green accent line on the left edge of each content
+ * section (everything below the hero). Plus 4 floating ambient
+ * LED dots that drift around the viewport at different cadences.
+ *
+ * Scoped via [data-page="agent"] so these only appear on agent.html.
+ * ------------------------------------------------------------- */
+
+body[data-page="agent"] main > section:not(.agent-hero) {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+body[data-page="agent"] main > section:not(.agent-hero)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    var(--green-500) 0%,
+    var(--green-700) 60%,
+    transparent 100%
+  );
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
+  pointer-events: none;
+}
+
+/* Floating ambient LEDs — four corners with offset drift cycles */
+body[data-page="agent"]::before,
+body[data-page="agent"]::after,
+body[data-page="agent"] main::before,
+body[data-page="agent"] main::after {
+  content: "";
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--green-500);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.7);
+  pointer-events: none;
+  z-index: 5;
+}
+
+body[data-page="agent"]::before {
+  top: 18vh;
+  right: 6%;
+  animation: drift 9s ease-in-out infinite;
+}
+
+body[data-page="agent"]::after {
+  top: 75vh;
+  left: 5%;
+  animation: drift 11s ease-in-out infinite 2s;
+}
+
+body[data-page="agent"] main::before {
+  top: 50vh;
+  right: 4%;
+  animation: drift 13s ease-in-out infinite 4s;
+}
+
+body[data-page="agent"] main::after {
+  top: 35vh;
+  left: 3%;
+  animation: drift 15s ease-in-out infinite 1s;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(8px, -20px);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-5px, -10px);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(3px, 10px);
+    opacity: 0.5;
+  }
+}
+
+/* Reduced motion — kill drift animations */
+@media (prefers-reduced-motion: reduce) {
+  body[data-page="agent"]::before,
+  body[data-page="agent"]::after,
+  body[data-page="agent"] main::before,
+  body[data-page="agent"] main::after {
+    animation: none;
+    opacity: 0.5;
+  }
 }
 
 /* -------------------------------------------------------------
