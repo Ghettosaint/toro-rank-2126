@@ -323,11 +323,26 @@ code,
 }
 
 .choice__footer {
+  margin-top: auto;
+  text-align: center;
+}
+
+.choice__footer-line {
   color: var(--text-dim);
   font-size: 0.82rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  margin-top: auto;
+  margin: 0;
+}
+
+/* Sub-line: clarifies what the consultant actually does. Lower-key
+   than the headline so the cinematic moment still owns the screen. */
+.choice__footer-sub {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  margin: 0.6rem auto 0;
+  max-width: 50ch;
 }
 
 /* -------------------------------------------------------------
@@ -666,6 +681,89 @@ section {
   color: var(--text-muted);
   margin: 0;
   line-height: 1.55;
+}
+
+/* -------------------------------------------------------------
+ * Known signals — keyword chip cloud
+ * Lightweight strip of vocabulary the consultant works in. Sits
+ * between the manifesto and the services grid as a "proof ribbon".
+ * ------------------------------------------------------------- */
+.signals__lead {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.signals__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.signals__list li {
+  padding: 0.42rem 0.85rem;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.signals__list li:hover {
+  border-color: var(--green-500);
+  color: var(--text-bright);
+}
+
+/* -------------------------------------------------------------
+ * Field log — concrete missions, formatted as agent dossier entries
+ * ------------------------------------------------------------- */
+.field-log__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.field-log__entry {
+  display: grid;
+  grid-template-columns: minmax(120px, max-content) 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px dashed var(--border);
+  align-items: baseline;
+}
+
+.field-log__entry:last-child {
+  border-bottom: none;
+}
+
+.field-log__id {
+  color: var(--green-500);
+  text-shadow: var(--glow-sm);
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.field-log__body {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  max-width: 64ch;
+}
+
+/* On narrow screens, stack the id above the body */
+@media (max-width: 560px) {
+  .field-log__entry {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
 }
 
 /* -------------------------------------------------------------
