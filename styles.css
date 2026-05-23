@@ -18,9 +18,9 @@
   color-scheme: dark;
 
   /* Background — very dark green tint (One Color rule: green dominates the canvas) */
-  --bg: #011006;
-  --surface: #021807;
-  --surface-strong: #03210b;
+  --bg: #010e05;
+  --surface: #021607;
+  --surface-strong: #031e0a;
 
   /* Acid green — the one color */
   --green-100: #e8ffe8;
