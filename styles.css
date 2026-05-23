@@ -504,6 +504,7 @@ body[data-page="oracle"] .nav-menu__item[href="oracle.html"] {
 .choice__pills {
   display: flex;
   gap: 3rem;
+  margin-top: 4.5rem;
   margin-bottom: 4rem;
   flex-wrap: wrap;
   justify-content: center;
