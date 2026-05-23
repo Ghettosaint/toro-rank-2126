@@ -37,8 +37,8 @@ import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 //     agent.html#rot=0,1.57,0       (90° Y — turn right)
 //     agent.html#rot=0,-1.57,0      (-90° Y — turn left)
 // =============================================================
-const BULL_HEAD_ROT_X = Math.PI / 2;
-const BULL_HEAD_ROT_Y = 0;
+const BULL_HEAD_ROT_X = 0;
+const BULL_HEAD_ROT_Y = Math.PI;
 const BULL_HEAD_ROT_Z = 0;
 
 /** Read rotation override from URL hash if present. */
