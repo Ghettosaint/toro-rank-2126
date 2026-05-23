@@ -491,6 +491,42 @@ code,
   }
 }
 
+/* Agent hero — 2-column grid. Copy left, bull head 3D right. */
+.agent-hero {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 2.5rem;
+  align-items: center;
+  margin-bottom: 6rem;
+  min-height: 60vh;
+}
+
+.agent-hero__visual {
+  position: relative;
+  min-height: 420px;
+  height: 100%;
+}
+
+#agent-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 860px) {
+  .agent-hero {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .agent-hero__visual {
+    min-height: 320px;
+    order: -1; /* head appears above the copy on mobile */
+  }
+}
+
 /* Hero copy on agent.html — fades in after boot lines */
 .agent-hero__title,
 .agent-hero__subtitle,
@@ -652,6 +688,47 @@ section {
     box-shadow var(--dur-fast) var(--ease-out);
 }
 
+.service {
+  position: relative;
+}
+
+/*
+ * Boot-up corner brackets — appear when card enters the viewport.
+ * Reads as "system boundary established" — agent-fx.js adds the
+ * .is-booted class via IntersectionObserver.
+ */
+.service::before,
+.service::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--green-500);
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-out);
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(0, 255, 102, 0.45);
+}
+
+.service::before {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.service::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+}
+
+.service.is-booted::before,
+.service.is-booted::after {
+  opacity: 1;
+}
+
 .service:hover {
   border-color: var(--green-500);
   box-shadow: var(--glow-sm);
@@ -709,9 +786,19 @@ section {
   color: var(--text);
   font-size: 0.85rem;
   letter-spacing: 0.02em;
+  /* Stagger-in start state — agent-fx.js adds .is-booted */
+  opacity: 0;
+  transform: translateY(6px);
   transition:
+    opacity 0.45s var(--ease-out),
+    transform 0.45s var(--ease-out),
     border-color var(--dur-fast) var(--ease-out),
     color var(--dur-fast) var(--ease-out);
+}
+
+.signals__list li.is-booted {
+  opacity: 1;
+  transform: none;
 }
 
 .signals__list li:hover {
@@ -722,6 +809,12 @@ section {
 /* -------------------------------------------------------------
  * Field log — concrete missions, formatted as agent dossier entries
  * ------------------------------------------------------------- */
+.field-log__lead {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.02em;
+}
+
 .field-log__list {
   list-style: none;
   padding: 0;
@@ -735,6 +828,17 @@ section {
   padding: 1.5rem 0;
   border-bottom: 1px dashed var(--border);
   align-items: baseline;
+  /* Boot-up — slides in from left when in view */
+  opacity: 0;
+  transform: translateX(-12px);
+  transition:
+    opacity 0.55s var(--ease-out),
+    transform 0.55s var(--ease-out);
+}
+
+.field-log__entry.is-booted {
+  opacity: 1;
+  transform: none;
 }
 
 .field-log__entry:last-child {

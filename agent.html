@@ -113,6 +113,19 @@
     />
 
     <link rel="stylesheet" href="styles.css" />
+
+    <!-- Import map for Three.js — needed for the bull head scene -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <!-- Preload bull head if present so download starts during HTML parse -->
+    <link rel="preload" href="assets/bull-head.glb" as="fetch" crossorigin="anonymous" />
   </head>
   <body data-page="agent">
     <div class="page-shell">
@@ -138,29 +151,39 @@
       </div>
 
       <main>
-        <!-- Hero: type-on intro then headline -->
+        <!-- Hero: 2-column. Copy left, bull head 3D right. Stacks on mobile. -->
         <section class="agent-hero">
-          <div class="boot__lines" aria-live="polite">
-            <noscript>
-              <span class="boot__line">&gt; channel open.</span>
-              <span class="boot__line">&gt; you took the green pill.</span>
-            </noscript>
+          <div class="agent-hero__copy">
+            <div class="boot__lines" aria-live="polite">
+              <noscript>
+                <span class="boot__line">&gt; channel open.</span>
+                <span class="boot__line">&gt; you took the green pill.</span>
+              </noscript>
+            </div>
+
+            <h1 class="agent-hero__title">
+              The web<br />reads you back.
+            </h1>
+
+            <p class="agent-hero__subtitle">
+              You took the green pill. The web you knew was rendered for the wrong audience. The
+              real readers never opened a tab — and they never will.
+            </p>
+
+            <div class="agent-hero__cta">
+              <a class="button" href="#services">
+                See the work <span class="button__arrow" aria-hidden="true">→</span>
+              </a>
+            </div>
           </div>
 
-          <h1 class="agent-hero__title">
-            The web<br />reads you back.
-          </h1>
-
-          <p class="agent-hero__subtitle">
-            You took the green pill. Now you see it. Every page is consumed by something else first
-            — an agent, a crawler, a model orchestrating a thousand other models. The user arrives
-            last, if at all.
-          </p>
-
-          <div class="agent-hero__cta">
-            <a class="button" href="#services">
-              See the work <span class="button__arrow" aria-hidden="true">→</span>
-            </a>
+          <div class="agent-hero__visual">
+            <!--
+              Bull head 3D scene. agent-3d.js mounts on this canvas.
+              Loads assets/bull-head.glb if present; otherwise the scene
+              shows only the particle field.
+            -->
+            <canvas id="agent-canvas" aria-hidden="true"></canvas>
           </div>
         </section>
 
@@ -175,13 +198,14 @@
               The web stopped being read by humans a long time ago.
             </p>
             <p>
-              By 2126, every page is consumed by something else first. Most sites still don't know
-              this. They write for an audience that never opens the tab.
+              By 2126, every page is consumed by something else first. Most sites never realized.
+              They keep writing for an audience that doesn't open the tab — sometimes doesn't
+              render the HTML.
             </p>
             <p>
-              I do the opposite. I tune sites for the machines that read them — their dialects,
-              their parsers, their contracts. Schema. MCP. A2A. The names change every decade; the
-              work doesn't. Make the page legible to the thing that actually reads it.
+              I do the opposite. I tune sites for the machines that read them. Their dialects.
+              Their parsers. Their contracts. Schema. MCP. A2A. The names change every decade. The
+              work doesn't: make the page legible to whatever is reading it.
             </p>
             <p class="manifesto__close">
               If a model can understand your business in ten tokens, it will recommend you.<br />
@@ -271,6 +295,7 @@
             <span class="section-heading__index">04 //</span>
             <h2>Field log</h2>
           </div>
+          <p class="field-log__lead">Three logs. Type-redacted. Mission shape only.</p>
           <ol class="field-log__list">
             <li class="field-log__entry">
               <span class="field-log__id">LOG :: 014-α</span>
@@ -305,7 +330,8 @@
           </div>
           <p class="channel__lead">The relay is open. Channel encrypted.</p>
           <p class="channel__sub">
-            Send a broken site, an invisible brand, or an agent-readiness problem.
+            Send a broken site, an invisible brand, or an agent-readiness problem. No diagnostics
+            needed — I'll bring my own.
           </p>
           <ul class="channel__list">
             <li>
@@ -330,5 +356,7 @@
     </div>
 
     <script src="script.js"></script>
+    <script type="module" src="agent-3d.js"></script>
+    <script src="agent-fx.js"></script>
   </body>
 </html>
