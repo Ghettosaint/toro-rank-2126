@@ -107,6 +107,7 @@
       { selector: "#manifesto", label: "MANIFESTO", log: "manifesto parsed" },
       { selector: "#services, #known-signals", label: "VOCAB_INDEX", log: "service vocabulary indexed" },
       { selector: "#field-log, #services", label: "SERVICE_CATALOG", log: "catalog mapped · 6 services" },
+      { selector: "#unreadable-demo", label: "HIDDEN_SECTION", log: "hidden section found · legibility proof", dwell: 6000 },
       { selector: "#open-channel, #field-log", label: "MISSION_LOG", log: "mission log scanned" },
       { selector: ".site-footer", label: "TRANSMISSION_ENDPOINT", log: "next endpoint :: take control" },
     ],
@@ -621,7 +622,17 @@
 
     const stopMs = prefersReducedMotion ? 0 : 1200;
 
+    // Cumulative timing so individual markers can have longer dwell
+    // times (used for the hidden section so the agent visibly pauses
+    // there, "reads" the chaos, and triggers the legibility reveal).
+    let nextAt = 400;
     endpointMarkers.forEach(function (marker, i) {
+      const arriveAt = nextAt;
+      const dwell = (marker.dwell !== undefined && marker.dwell !== null)
+        ? marker.dwell
+        : stopMs;
+      nextAt += dwell;
+
       const t = window.setTimeout(function () {
         // Previous endpoint → fully visited; previous TARGET → captured
         if (i > 0) {
@@ -651,6 +662,35 @@
           if (Math.abs(tgtY - window.scrollY) > window.innerHeight * 0.4) {
             window.scrollTo({ top: Math.max(0, tgtY), behavior: "smooth" });
           }
+        }
+        // Hidden section special: after a beat to let the user see
+        // the chaotic state, programmatically trigger MAKE IT LEGIBLE
+        // so the agent visibly "reads + organizes" the section.
+        if (marker.target && marker.target.id === "unreadable-demo") {
+          const tDemo = window.setTimeout(function () {
+            const makeBtn = marker.target.querySelector(".legibility-demo__make");
+            if (makeBtn && !makeBtn.hidden) {
+              try { makeBtn.click(); } catch (e) {}
+            }
+          }, 2200);
+          traversalTimers.push(tDemo);
+          // Echo into terminal for jury visibility
+          const tEcho = window.setTimeout(function () {
+            const echo = document.createElement("li");
+            echo.textContent = "> analyzing chaos · sorting fragments...";
+            terminalLines.appendChild(echo);
+            window.setTimeout(function () { echo.classList.add("is-visible"); }, 60);
+            terminalLines.scrollTop = terminalLines.scrollHeight;
+          }, 1200);
+          traversalTimers.push(tEcho);
+          const tEcho2 = window.setTimeout(function () {
+            const echo2 = document.createElement("li");
+            echo2.textContent = "> structure recovered · 8 signals readable";
+            terminalLines.appendChild(echo2);
+            window.setTimeout(function () { echo2.classList.add("is-visible"); }, 60);
+            terminalLines.scrollTop = terminalLines.scrollHeight;
+          }, 3200);
+          traversalTimers.push(tEcho2);
         }
         // Append terminal log — two lines per endpoint:
         //   "> scanning ..." → "> stored ..." after a beat
@@ -693,7 +733,7 @@
           }, stopMs);
           traversalTimers.push(tFinal);
         }
-      }, 400 + i * stopMs);
+      }, arriveAt);
       traversalTimers.push(t);
     });
   }

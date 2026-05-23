@@ -144,6 +144,7 @@
 
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="assets/css/agent-vision.css" />
+    <link rel="stylesheet" href="assets/css/legibility-demo.css" />
 
     <!-- Structured data: ProfessionalService catalog -->
     <script type="application/ld+json">
@@ -428,6 +429,53 @@
           </div>
         </section>
 
+        <!-- Interactive demo: unreadable page → legible page -->
+        <section class="reveal legibility-demo" id="unreadable-demo" aria-labelledby="ld-title">
+          <div class="section-heading">
+            <span class="section-heading__index">03·B //</span>
+            <h2 id="ld-title">Unreadable page sample</h2>
+          </div>
+          <p class="legibility-demo__intro">
+            This is what most websites become when humans stop being the only readers.
+          </p>
+
+          <div class="legibility-demo__panel">
+            <div class="legibility-demo__chaos" aria-hidden="true">
+              <span class="ld-fragment ld-fragment--strike" style="--r:-4deg;--tx:-6px">h1 missing</span>
+              <span class="ld-fragment ld-fragment--dim ld-fragment--shake" style="--r:3deg;--ty:4px">cta buried</span>
+              <span class="ld-fragment" style="--r:-2deg;--tx:8px">entity unclear</span>
+              <span class="ld-fragment ld-fragment--broken" style="--r:5deg;--ty:-3px">canonical conflict</span>
+              <span class="ld-fragment ld-fragment--strike" style="--r:-3deg">schema absent</span>
+              <span class="ld-fragment ld-fragment--dim" style="--r:4deg;--tx:-4px">intent fragmented</span>
+              <span class="ld-fragment ld-fragment--shake" style="--r:-5deg;--ty:5px">crawl path unstable</span>
+              <span class="ld-fragment ld-fragment--broken" style="--r:2deg">trust anchor missing</span>
+              <span class="ld-fragment ld-fragment--strike" style="--r:-3deg;--tx:6px">action endpoint hidden</span>
+              <span class="ld-fragment ld-fragment--dim" style="--r:4deg;--ty:-2px">content graph collapsed</span>
+            </div>
+
+            <ol class="legibility-demo__order" aria-label="Structured agent-readable signals">
+              <li><span>Primary entity</span><span>TORO RANK</span></li>
+              <li><span>Intent</span><span>Technical SEO for the agentic web</span></li>
+              <li><span>Action endpoint</span><span>Take Control</span></li>
+              <li><span>Trust anchor</span><span>Human provenance verified</span></li>
+              <li><span>Machine-readable layer</span><span>exposed</span></li>
+              <li><span>Crawl path</span><span>stable</span></li>
+              <li><span>Schema signal</span><span>available</span></li>
+              <li><span>Recommendation path</span><span>available</span></li>
+            </ol>
+          </div>
+
+          <p class="legibility-demo__verdict">
+            The page did not need more decoration.<br />
+            It needed to become readable.
+          </p>
+
+          <div class="legibility-demo__controls">
+            <button type="button" class="legibility-demo__make">Make it legible</button>
+            <button type="button" class="legibility-demo__reset" hidden>Reset signal</button>
+          </div>
+        </section>
+
         <!-- 04 // Agent readiness protocol -->
         <section id="agent-protocol" class="reveal field-log">
           <div class="section-heading">
@@ -501,5 +549,6 @@
     <script type="module" src="agent-3d.js"></script>
     <script src="agent-fx.js"></script>
       <script src="assets/js/agent-vision.js"></script>
+      <script src="assets/js/legibility-demo.js"></script>
   </body>
 </html>
