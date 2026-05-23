@@ -1,0 +1,619 @@
+/*
+ * AGENT VISION MODE — site-wide toggleable overlay
+ *
+ * When body.agent-vision-active is set, the site gets an extra
+ * "AI interpretation" layer over the existing design without
+ * replacing or hiding any real content.
+ *
+ * Layers added (in z-index order, bottom → top):
+ *   1. Neon outlines on header/nav/main/section/article/form/footer
+ *   2. Agent labels (pseudo-elements) attached to semantic blocks
+ *   3. HUD grid overlay (full viewport, fixed)
+ *   4. Scanline overlay (full viewport, fixed)
+ *   5. Agent terminal panel (fixed bottom)
+ *   6. Toggle button (always visible, even when inactive)
+ *
+ * Toggle button + terminal panel both live in this file's styles.
+ * Everything respects prefers-reduced-motion.
+ */
+
+/* -------------------------------------------------------------
+ * Toggle button — fixed bottom-right (desktop), bottom-center (mobile)
+ * Always visible, even when agent vision is inactive.
+ * ------------------------------------------------------------- */
+.agent-vision-toggle {
+  position: fixed;
+  bottom: 1.2rem;
+  right: 1.2rem;
+  z-index: 9100;
+  padding: 0.7rem 1.1rem;
+  background: rgba(1, 12, 5, 0.92);
+  border: 1px solid #00ff66;
+  color: #e8ffe8;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 0 18px rgba(0, 255, 102, 0.25);
+  transition:
+    background 0.2s ease-out,
+    color 0.2s ease-out,
+    box-shadow 0.2s ease-out,
+    transform 0.2s ease-out;
+}
+
+.agent-vision-toggle:hover {
+  background: #00ff66;
+  color: #010c05;
+  box-shadow: 0 0 28px rgba(0, 255, 102, 0.6);
+  transform: translateY(-2px);
+}
+
+.agent-vision-toggle:focus-visible {
+  outline: 2px solid #e8ffe8;
+  outline-offset: 3px;
+}
+
+body.agent-vision-active .agent-vision-toggle {
+  background: #00ff66;
+  color: #010c05;
+  box-shadow: 0 0 28px rgba(0, 255, 102, 0.55);
+}
+
+@media (max-width: 720px) {
+  .agent-vision-toggle {
+    bottom: 0.9rem;
+    right: 50%;
+    transform: translateX(50%);
+    font-size: 0.7rem;
+    padding: 0.6rem 0.9rem;
+  }
+  .agent-vision-toggle:hover {
+    transform: translateX(50%) translateY(-2px);
+  }
+}
+
+/* -------------------------------------------------------------
+ * Agent terminal panel — fixed bottom corner, only visible
+ * when agent vision is active. Created by JS.
+ * ------------------------------------------------------------- */
+.agent-vision-terminal {
+  position: fixed;
+  bottom: 4.4rem;
+  right: 1.2rem;
+  width: min(360px, calc(100vw - 2.4rem));
+  max-height: 60vh;
+  background: rgba(1, 12, 5, 0.94);
+  border: 1px solid #00ff66;
+  color: #00ff66;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  z-index: 9099;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 0 32px rgba(0, 255, 102, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+body.agent-vision-active .agent-vision-terminal {
+  display: flex;
+}
+
+.agent-vision-terminal__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.9rem;
+  border-bottom: 1px solid rgba(0, 255, 102, 0.35);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6dff8e;
+}
+
+.agent-vision-terminal__minimize {
+  background: transparent;
+  border: 1px solid rgba(0, 255, 102, 0.4);
+  color: #6dff8e;
+  padding: 0.1rem 0.55rem;
+  font-family: inherit;
+  font-size: 0.78rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.agent-vision-terminal__minimize:hover {
+  border-color: #00ff66;
+  color: #00ff66;
+}
+
+.agent-vision-terminal__minimize:focus-visible {
+  outline: 2px solid #00ff66;
+  outline-offset: 2px;
+}
+
+.agent-vision-terminal__lines {
+  list-style: none;
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.agent-vision-terminal__lines li {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.32s ease-out, transform 0.32s ease-out;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.agent-vision-terminal__lines li.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.agent-vision-terminal.is-minimized .agent-vision-terminal__lines {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .agent-vision-terminal {
+    bottom: 4rem;
+    right: 0.8rem;
+    left: 0.8rem;
+    width: auto;
+    max-height: 45vh;
+  }
+}
+
+/* -------------------------------------------------------------
+ * Active overlays — only when agent vision is on.
+ *
+ * Scanline + HUD grid layered via body::before/::after. Both are
+ * pointer-events: none so they never block interaction.
+ * ------------------------------------------------------------- */
+body.agent-vision-active::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8501;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 3px,
+    rgba(0, 255, 102, 0.05) 3px,
+    rgba(0, 255, 102, 0.05) 4px
+  );
+}
+
+body.agent-vision-active::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8500;
+  background-image:
+    linear-gradient(to right, rgba(0, 255, 102, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 102, 0.07) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* -------------------------------------------------------------
+ * Digital rain canvas — the iconic Matrix layer.
+ * Created by JS, animated only while body has the active class.
+ * Sits between the body bg and content, low opacity so text stays
+ * readable.
+ * ------------------------------------------------------------- */
+.agent-vision-rain {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 8499;
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+  mix-blend-mode: screen;
+}
+
+body.agent-vision-active .agent-vision-rain {
+  opacity: 0.4;
+}
+
+/* -------------------------------------------------------------
+ * Boot flash — quick green sweep when activation toggles on.
+ * Triggered by JS adding .agent-vision-booting briefly.
+ * ------------------------------------------------------------- */
+.agent-vision-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9098;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 255, 102, 0) 0%,
+    rgba(0, 255, 102, 0.35) 50%,
+    rgba(0, 255, 102, 0) 100%
+  );
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+body.agent-vision-booting .agent-vision-flash {
+  animation: agentVisionFlash 700ms ease-out forwards;
+}
+
+@keyframes agentVisionFlash {
+  0% { transform: translateY(-100%); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(120%); opacity: 0; }
+}
+
+/* -------------------------------------------------------------
+ * Text glow + glitch flicker on labels when active
+ * ------------------------------------------------------------- */
+body.agent-vision-active h1,
+body.agent-vision-active h2,
+body.agent-vision-active h3,
+body.agent-vision-active .nav-menu__item,
+body.agent-vision-active .status-bar,
+body.agent-vision-active p,
+body.agent-vision-active span {
+  text-shadow: 0 0 6px rgba(0, 255, 102, 0.35);
+}
+
+body.agent-vision-active header::before,
+body.agent-vision-active nav::before,
+body.agent-vision-active main::before,
+body.agent-vision-active section::before,
+body.agent-vision-active article::before,
+body.agent-vision-active form::before,
+body.agent-vision-active footer::before {
+  animation: avLabelGlitch 3.5s infinite;
+}
+
+@keyframes avLabelGlitch {
+  0%, 96%, 100% { opacity: 1; transform: translate(2px, -100%); }
+  97% { opacity: 0.3; transform: translate(4px, -100%); }
+  98% { opacity: 1; transform: translate(-1px, -100%); }
+  99% { opacity: 0.7; transform: translate(2px, -100%); }
+}
+
+/* -------------------------------------------------------------
+ * Neon outlines on semantic blocks. Outlines (not borders) so
+ * they don't shift any existing layout.
+ * ------------------------------------------------------------- */
+body.agent-vision-active header,
+body.agent-vision-active nav,
+body.agent-vision-active main,
+body.agent-vision-active section,
+body.agent-vision-active article,
+body.agent-vision-active footer,
+body.agent-vision-active form {
+  outline: 1px dashed rgba(0, 255, 102, 0.4);
+  outline-offset: 2px;
+  position: relative;
+}
+
+/* -------------------------------------------------------------
+ * Agent labels — small pseudo-element tags attached to each
+ * semantic block. aria-hidden via CSS pseudo (decorative only).
+ * ------------------------------------------------------------- */
+body.agent-vision-active header::before {
+  content: "[ TRUST_HEADER ]";
+}
+body.agent-vision-active nav::before {
+  content: "[ CRAWL_PATH ]";
+}
+body.agent-vision-active main::before {
+  content: "[ CONTENT_GRAPH ]";
+}
+body.agent-vision-active section::before {
+  content: "[ SEMANTIC_BLOCK ]";
+}
+body.agent-vision-active article::before {
+  content: "[ KNOWLEDGE_NODE ]";
+}
+body.agent-vision-active form::before {
+  content: "[ TRANSMISSION_ENDPOINT ]";
+}
+body.agent-vision-active footer::before {
+  content: "[ TRUST_ANCHOR ]";
+}
+
+body.agent-vision-active header::before,
+body.agent-vision-active nav::before,
+body.agent-vision-active main::before,
+body.agent-vision-active section::before,
+body.agent-vision-active article::before,
+body.agent-vision-active form::before,
+body.agent-vision-active footer::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(2px, -100%);
+  background: #010c05;
+  color: #00ff66;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  padding: 0.12rem 0.5rem;
+  border: 1px solid rgba(0, 255, 102, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 8502;
+}
+
+/* h1 — small suffix tag inline, doesn't break layout */
+body.agent-vision-active h1::after {
+  content: " //PRIMARY_SIGNAL";
+  color: rgba(0, 255, 102, 0.55);
+  font-size: 0.32em;
+  letter-spacing: 0.2em;
+  vertical-align: super;
+  font-weight: 400;
+}
+
+/* a / button — minimal inline tags, kept subtle so they don't
+   clutter the page or break inline flow. */
+body.agent-vision-active a:not(.nav-menu__item):not(.status-bar__link):not(.agent-vision-toggle)::after {
+  content: " //AL";
+  color: rgba(0, 255, 102, 0.5);
+  font-size: 0.7em;
+  letter-spacing: 0.1em;
+}
+
+body.agent-vision-active button:not(.agent-vision-toggle):not(.agent-vision-terminal__minimize)::after {
+  content: " //AE";
+  color: rgba(0, 255, 102, 0.5);
+  font-size: 0.7em;
+  letter-spacing: 0.1em;
+  margin-left: 0.25rem;
+}
+
+/* -------------------------------------------------------------
+ * Endpoint traversal layer
+ *
+ * Markers attached to specific elements on each page, plus a
+ * "traveler" dot that hops between them in sequence to simulate
+ * an agent moving through endpoints. JS injects these into <body>
+ * at document coordinates (top/left includes scrollY/scrollX).
+ * ------------------------------------------------------------- */
+.agent-vision-endpoint {
+  position: absolute;
+  z-index: 8503;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+body.agent-vision-active .agent-vision-endpoint {
+  opacity: 1;
+}
+
+.agent-vision-endpoint__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid #00ff66;
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.55);
+  position: relative;
+}
+
+.agent-vision-endpoint.is-visited .agent-vision-endpoint__dot {
+  background: #00ff66;
+  box-shadow: 0 0 18px rgba(0, 255, 102, 0.8);
+}
+
+.agent-vision-endpoint.is-active .agent-vision-endpoint__dot {
+  background: #e8ffe8;
+  box-shadow: 0 0 26px rgba(232, 255, 232, 1);
+  animation: avEndpointPulse 0.8s ease-out 3;
+}
+
+@keyframes avEndpointPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.6); }
+}
+
+.agent-vision-endpoint__label {
+  position: absolute;
+  left: 18px;
+  top: -2px;
+  white-space: nowrap;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  color: #00ff66;
+  background: rgba(1, 12, 5, 0.85);
+  border: 1px solid rgba(0, 255, 102, 0.5);
+  padding: 0.15rem 0.5rem;
+  text-shadow: 0 0 6px rgba(0, 255, 102, 0.55);
+}
+
+/* Traveler — scanning reticle / crosshair SVG. Larger + more
+   visible than the previous dot; rotates slowly while moving. */
+.agent-vision-traveler {
+  position: absolute;
+  z-index: 8504;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  filter:
+    drop-shadow(0 0 14px #00ff66)
+    drop-shadow(0 0 28px rgba(0, 255, 102, 0.55))
+    drop-shadow(0 0 52px rgba(0, 255, 102, 0.35));
+  transition:
+    top 1.1s cubic-bezier(0.65, 0, 0.35, 1),
+    left 1.1s cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 0.4s ease-out;
+}
+
+.agent-vision-traveler svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  animation: avTravelerSpin 5s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes avTravelerSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+body.agent-vision-active .agent-vision-traveler {
+  opacity: 1;
+}
+
+/* -------------------------------------------------------------
+ * Target element scanning + capture states.
+ *
+ * When the traveler reaches an endpoint, the target element gets
+ * .av-target-active for ~800ms (scanline sweep). Then it switches
+ * to .av-target-captured (persistent green outline showing that
+ * the agent has "memorized" this element).
+ * ------------------------------------------------------------- */
+.av-target-active {
+  position: relative;
+  outline: 1.5px solid rgba(0, 255, 102, 0.8);
+  outline-offset: 4px;
+  z-index: 1;
+}
+
+.av-target-active::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 255, 102, 0.25) 45%,
+    rgba(232, 255, 232, 0.5) 50%,
+    rgba(0, 255, 102, 0.25) 55%,
+    transparent 100%
+  );
+  background-size: 100% 30%;
+  background-repeat: no-repeat;
+  background-position: 0% -30%;
+  animation: avScanSweep 0.85s ease-out forwards;
+  z-index: 8505;
+  mix-blend-mode: screen;
+}
+
+@keyframes avScanSweep {
+  from { background-position: 0% -30%; }
+  to { background-position: 0% 130%; }
+}
+
+.av-target-active::after {
+  content: "READING";
+  position: absolute;
+  top: -22px;
+  right: -2px;
+  background: #00ff66;
+  color: #010c05;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  padding: 0.18rem 0.5rem;
+  pointer-events: none;
+  z-index: 8506;
+  animation: avBadgeFade 0.9s ease-out forwards;
+}
+
+@keyframes avBadgeFade {
+  0% { opacity: 0; transform: translateY(4px); }
+  20% { opacity: 1; transform: none; }
+  100% { opacity: 1; transform: none; }
+}
+
+.av-target-captured {
+  outline: 1px solid rgba(0, 255, 102, 0.35);
+  outline-offset: 4px;
+}
+
+/* SVG path overlay between endpoints (drawn by JS) */
+.agent-vision-path {
+  position: absolute;
+  z-index: 8502;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+body.agent-vision-active .agent-vision-path {
+  opacity: 1;
+}
+
+.agent-vision-path path {
+  fill: none;
+  stroke: rgba(0, 255, 102, 0.55);
+  stroke-width: 1;
+  stroke-dasharray: 4 6;
+  filter: drop-shadow(0 0 4px rgba(0, 255, 102, 0.6));
+}
+
+/* -------------------------------------------------------------
+ * Reduced motion — kill the line reveal stagger
+ * ------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .agent-vision-toggle {
+    transition: none;
+  }
+  .agent-vision-toggle:hover {
+    transform: none;
+  }
+  @media (max-width: 720px) {
+    .agent-vision-toggle:hover {
+      transform: translateX(50%);
+    }
+  }
+  .agent-vision-terminal__lines li {
+    transition: none;
+  }
+  body.agent-vision-active header::before,
+  body.agent-vision-active nav::before,
+  body.agent-vision-active main::before,
+  body.agent-vision-active section::before,
+  body.agent-vision-active article::before,
+  body.agent-vision-active form::before,
+  body.agent-vision-active footer::before {
+    animation: none;
+  }
+  body.agent-vision-booting .agent-vision-flash {
+    animation: none;
+  }
+  .agent-vision-rain {
+    display: none;
+  }
+  .agent-vision-traveler {
+    transition: opacity 0.4s ease-out;
+  }
+  .agent-vision-traveler svg {
+    animation: none;
+  }
+  .agent-vision-endpoint.is-active .agent-vision-endpoint__dot {
+    animation: none;
+  }
+}
