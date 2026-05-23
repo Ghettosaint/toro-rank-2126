@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Phase B of the matrix transition — full inline, no dependency on script.js. -->
+    <script>
+      (function () {
+        try {
+          var raw = sessionStorage.getItem("matrixTransition");
+          if (!raw) return;
+          sessionStorage.removeItem("matrixTransition");
+
+          if (
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ) {
+            return;
+          }
+
+          var state;
+          try {
+            state = JSON.parse(raw);
+          } catch (e) {
+            return;
+          }
+          if (!state || Date.now() - state.timestamp > 8000) return;
+
+          var overlay = document.createElement("div");
+          overlay.id = "matrix-overlay";
+          overlay.style.cssText =
+            "position:fixed;inset:0;z-index:9999;background:#021a0c;" +
+            "pointer-events:all;opacity:1;transition:opacity 700ms ease-in;";
+          document.documentElement.appendChild(overlay);
+
+          var canvas = document.createElement("canvas");
+          canvas.style.cssText = "width:100%;height:100%;display:block;";
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          overlay.appendChild(canvas);
+
+          var ctx = canvas.getContext("2d");
+          var FS = 16;
+          var CHARS =
+            "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789";
+          var columns = Math.floor(canvas.width / FS);
+          var drops = new Array(columns);
+          for (var i = 0; i < columns; i++) drops[i] = Math.random() * -50;
+          ctx.font = FS + 'px "JetBrains Mono", Consolas, monospace';
+          ctx.textBaseline = "top";
+
+          var rafId = null;
+          var stopped = false;
+
+          function frame() {
+            if (stopped) return;
+            ctx.fillStyle = "rgba(2,26,12,0.08)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (var j = 0; j < drops.length; j++) {
+              var x = j * FS;
+              var y = drops[j] * FS;
+              ctx.fillStyle = "#e8ffe8";
+              ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, y);
+              ctx.fillStyle = "#00ff66";
+              ctx.fillText(
+                CHARS[Math.floor(Math.random() * CHARS.length)],
+                x,
+                y - FS
+              );
+              if (y > canvas.height && Math.random() > 0.975) drops[j] = 0;
+              drops[j]++;
+            }
+            rafId = requestAnimationFrame(frame);
+          }
+          frame();
+
+          setTimeout(function () {
+            overlay.style.opacity = "0";
+            setTimeout(function () {
+              stopped = true;
+              if (rafId) cancelAnimationFrame(rafId);
+              if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }, 700);
+          }, 1200);
+        } catch (e) {}
+      })();
+    </script>
+
+    <meta
+      name="description"
+      content="Take control — open transmission to TORO RANK 2126. Tell us your site anomaly, agent-readiness problem, or invisibility issue."
+    />
+    <meta name="theme-color" content="#021a0c" />
+    <meta name="color-scheme" content="dark" />
+
+    <meta property="og:title" content="TORO RANK 2126 — Take control" />
+    <meta property="og:description" content="Open transmission. State the anomaly." />
+    <meta property="og:type" content="website" />
+
+    <title>TORO RANK 2126 // Take control</title>
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23021a0c'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%2300ff66'/%3E%3C/svg%3E"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="take-control">
+    <div class="page-shell">
+      <!-- Status bar -->
+      <header class="status-bar">
+        <div class="status-bar__left">
+          <span class="status-bar__pulse" aria-hidden="true"></span>
+          <a class="status-bar__link" href="index.html">TORO RANK :: 2126</a>
+        </div>
+        <div class="status-bar__right">
+          <span>NODE :: 014</span>
+          <span>RELAY :: OPEN</span>
+        </div>
+      </header>
+
+      <!-- Centered nav menu — shared across all pages -->
+      <nav class="nav-menu" aria-label="Primary">
+        <a class="nav-menu__item" href="index.html">/</a>
+        <a class="nav-menu__item" href="agent.html">// agent</a>
+        <a class="nav-menu__item" href="crawl.html">// crawl</a>
+        <a class="nav-menu__item" href="take-control.html">// take control</a>
+      </nav>
+
+      <div class="subpage-header">
+        <a class="back-link" href="index.html">
+          <span class="back-link__arrow" aria-hidden="true">←</span>
+          Back to the choice
+        </a>
+        <span class="subpage-label">// TRANSMISSION DESK</span>
+      </div>
+
+      <main>
+        <!-- Hero -->
+        <section class="control-hero">
+          <h1 class="control-hero__title">Take<br />control.</h1>
+          <p class="control-hero__sub">
+            Open the channel. State the anomaly. I'll bring my own diagnostics.
+          </p>
+        </section>
+
+        <!-- The form -->
+        <section class="control-section">
+          <form class="control-form" id="controlForm" novalidate>
+            <div class="control-form__row">
+              <label class="control-form__label" for="cf-name">// 01 · Identity</label>
+              <input
+                type="text"
+                id="cf-name"
+                name="name"
+                required
+                autocomplete="name"
+                placeholder="Designation"
+                class="control-form__input"
+              />
+            </div>
+
+            <div class="control-form__row">
+              <label class="control-form__label" for="cf-email">// 02 · Return channel</label>
+              <input
+                type="email"
+                id="cf-email"
+                name="email"
+                required
+                autocomplete="email"
+                placeholder="encrypted@channel"
+                class="control-form__input"
+              />
+            </div>
+
+            <div class="control-form__row">
+              <span class="control-form__label">// 03 · Problem class</span>
+              <div class="control-form__options" role="radiogroup" aria-label="Problem class">
+                <label class="control-form__option">
+                  <input type="radio" name="subject" value="index-collapse" />
+                  <span>Index collapse</span>
+                </label>
+                <label class="control-form__option">
+                  <input type="radio" name="subject" value="dialect-failure" />
+                  <span>Dialect failure</span>
+                </label>
+                <label class="control-form__option">
+                  <input type="radio" name="subject" value="agent-invisibility" />
+                  <span>Agent invisibility</span>
+                </label>
+                <label class="control-form__option">
+                  <input type="radio" name="subject" value="site-migration" />
+                  <span>Site migration</span>
+                </label>
+                <label class="control-form__option">
+                  <input type="radio" name="subject" value="latency-violation" />
+                  <span>Latency violation</span>
+                </label>
+                <label class="control-form__option">
+                  <input type="radio" name="subject" value="other" />
+                  <span>Other anomaly</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="control-form__row">
+              <label class="control-form__label" for="cf-url">// 04 · Target URL</label>
+              <input
+                type="url"
+                id="cf-url"
+                name="url"
+                autocomplete="url"
+                placeholder="https://"
+                class="control-form__input"
+              />
+            </div>
+
+            <div class="control-form__row">
+              <label class="control-form__label" for="cf-message">// 05 · Transmission</label>
+              <textarea
+                id="cf-message"
+                name="message"
+                required
+                rows="6"
+                placeholder="State the anomaly. Symptoms, timeline, what changed."
+                class="control-form__input control-form__textarea"
+              ></textarea>
+            </div>
+
+            <button type="submit" class="control-form__submit">
+              <span class="control-form__submit-label">Open transmission</span>
+              <span class="control-form__submit-arrow" aria-hidden="true">→</span>
+            </button>
+
+            <p class="control-form__note">
+              Encrypted. Routed to deyan@tororank.com. Response window: 24 hours, Veliko Tarnovo
+              node.
+            </p>
+          </form>
+
+          <!-- Success overlay — shown after successful submit -->
+          <div class="control-success" id="controlSuccess" aria-live="polite" hidden>
+            <div class="control-success__inner">
+              <p class="control-success__status">// transmission confirmed</p>
+              <h2 class="control-success__headline" data-final="CHANNEL ESTABLISHED.">
+                CHANNEL ESTABLISHED.
+              </h2>
+              <p class="control-success__body">
+                Your packet is on the wire. Your email client should open shortly. If it
+                doesn't, copy <code>deyan@tororank.com</code> manually.
+              </p>
+              <p class="control-success__footer">
+                Response window :: 24 hours · Veliko Tarnovo node · GMT+3
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>TORO RANK :: Veliko Tarnovo node :: 2126</p>
+        <p>Built during A3 Web Design Challenge — May 2026.</p>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="take-control.js"></script>
+  </body>
+</html>

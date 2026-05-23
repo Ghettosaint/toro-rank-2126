@@ -19,6 +19,23 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 
+// =============================================================
+// BULL HEAD INITIAL ORIENTATION
+//
+// Tweak these three values in radians if the head loads facing
+// the wrong way. Most common useful values:
+//
+//   0          = no rotation on that axis
+//   Math.PI    = 180° flip
+//   Math.PI/2  = 90° turn (clockwise looking down +axis)
+//   -Math.PI/2 = 90° turn the other way
+//
+// Y = yaw (turn left/right), X = pitch (tilt up/down), Z = roll.
+// =============================================================
+const BULL_HEAD_ROT_X = 0;
+const BULL_HEAD_ROT_Y = 0;
+const BULL_HEAD_ROT_Z = 0;
+
 const canvas = document.getElementById("agent-canvas");
 if (canvas) {
   initAgentScene();
@@ -131,8 +148,8 @@ function initAgentScene() {
       const targetSize = 3.4;
       model.scale.setScalar(targetSize / size);
 
-      // Bull head GLB came in facing backwards — flip 180° to face camera
-      model.rotation.y = Math.PI;
+      // Apply initial orientation (tweak constants at top of file if wrong)
+      model.rotation.set(BULL_HEAD_ROT_X, BULL_HEAD_ROT_Y, BULL_HEAD_ROT_Z);
 
       // Prepare materials for fade-in
       model.traverse((node) => {
