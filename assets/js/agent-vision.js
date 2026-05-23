@@ -74,6 +74,39 @@
       "Action endpoint: open transmission",
       "Status: ready for contact.",
     ],
+    dispatches: [
+      "AGENT VISION ENABLED",
+      "Portfolio layer detected.",
+      "Eight sealed field artifacts found.",
+      "Flip cards contain agent readouts.",
+      "Dossier modals expose the human version.",
+      "Redactions: tasteful enough.",
+      "Recommendation: inspect dispatches before transmission.",
+    ],
+    terms: [
+      "AGENT VISION ENABLED",
+      "Terms of use detected.",
+      "Compliance theater: operational.",
+      "Human promise requested: do not break the node.",
+      "Agent promise requested: pretend to read the fine print.",
+      "Legal risk: mostly decorative.",
+    ],
+    privacy: [
+      "AGENT VISION ENABLED",
+      "Privacy policy detected.",
+      "Consent signal: blinking politely.",
+      "Data appetite: restrained by human supervision.",
+      "Inference layer: unreasonably confident.",
+      "Recommendation: ask a human before becoming folklore.",
+    ],
+    cookies: [
+      "AGENT VISION ENABLED",
+      "Cookie policy detected.",
+      "Cookie jar status: empty.",
+      "Local memory found: Agent Vision preference.",
+      "Tracking appetite: denied snacks.",
+      "Verdict: crumbs are obsolete; signal remains.",
+    ],
   };
 
   // Default copy when no key matches (e.g. /404 or new pages)
@@ -95,7 +128,7 @@
   const ENDPOINT_PATHS = {
     home: [
       { selector: ".status-bar", label: "INGRESS", log: "ingress secured · 2126 node" },
-      { selector: ".nav-menu", label: "CRAWL_PATHS", log: "crawl paths mapped · 5 routes" },
+      { selector: ".nav-menu", label: "CRAWL_PATHS", log: "crawl paths mapped · 6 routes" },
       { selector: ".choice__title", label: "PRIMARY_SIGNAL", log: "primary signal located" },
       { selector: ".pill--loop", label: "BRANCH_LOOP", log: "branch a :: loop (simulation)" },
       { selector: ".pill--signal", label: "BRANCH_SIGNAL", log: "branch b :: signal (recommended)" },
@@ -142,6 +175,37 @@
       { selector: "#signalRadar, canvas", label: "RADAR_SURFACE", log: "radar surface acquired" },
       { selector: "h2", label: "METRIC_GRID", log: "metric grid enumerated" },
       { selector: ".site-footer", label: "EGRESS", log: "signal map archived" },
+    ],
+    dispatches: [
+      { selector: ".status-bar", label: "INGRESS", log: "dispatches ingress" },
+      { selector: "h1", label: "FIELD_RECORD", log: "field record located" },
+      { selector: ".dispatch:nth-child(1)", label: "DSP_α_RECOVERY", log: "recovery dispatch read" },
+      { selector: ".dispatch:nth-child(3)", label: "DSP_γ_ENDPOINT", log: "endpoint dispatch read" },
+      { selector: ".dispatch:nth-child(5)", label: "DSP_ε_FORENSICS", log: "forensics dispatch read" },
+      { selector: ".dispatch:nth-child(7)", label: "DSP_η_ENTITY", log: "entity dispatch read" },
+      { selector: ".dispatches__footer", label: "SEAL_NOTICE", log: "redaction notice acknowledged" },
+      { selector: ".site-footer", label: "EGRESS", log: "field record archived" },
+    ],
+    terms: [
+      { selector: ".status-bar", label: "INGRESS", log: "terms packet opened" },
+      { selector: "h1", label: "LEGAL_SIGNAL", log: "fine print translated" },
+      { selector: ".policy-card:nth-child(1)", label: "ACCESS_RULE", log: "reasonable human clause found" },
+      { selector: ".policy-card:nth-child(3)", label: "NO_GUARANTEE", log: "oracle liability successfully dodged" },
+      { selector: ".site-footer__legal", label: "FOOTNOTE", log: "tiny legal tunnel mapped" },
+    ],
+    privacy: [
+      { selector: ".status-bar", label: "INGRESS", log: "privacy packet opened" },
+      { selector: "h1", label: "CONSENT_SIGNAL", log: "privacy exists, agent amused" },
+      { selector: ".policy-card:nth-child(1)", label: "DATA_INTAKE", log: "received data enumerated" },
+      { selector: ".policy-card:nth-child(3)", label: "NO_RESALE", log: "no sale detected" },
+      { selector: ".site-footer__legal", label: "FOOTNOTE", log: "consent footnotes archived" },
+    ],
+    cookies: [
+      { selector: ".status-bar", label: "INGRESS", log: "cookie packet opened" },
+      { selector: "h1", label: "CRUMB_STATUS", log: "cookies declared dead" },
+      { selector: ".policy-card:nth-child(1)", label: "LOCAL_MEMORY", log: "Agent Vision preference located" },
+      { selector: ".policy-card:nth-child(4)", label: "CLEAR_STORAGE", log: "forgetting procedure available" },
+      { selector: ".site-footer__legal", label: "FOOTNOTE", log: "crumb trail terminated" },
     ],
     oracle: [
       { selector: ".status-bar", label: "INGRESS", log: "oracle channel ingress" },

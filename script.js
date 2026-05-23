@@ -348,7 +348,7 @@ function bindBfcacheCleanup() {
  * trigger the transition. Defensive — does nothing if none exist.
  */
 function bindMatrixTransition() {
-  const links = document.querySelectorAll(".pill, .back-link, .nav-menu__item, .status-bar__link, .button[href$='.html']");
+  const links = document.querySelectorAll(".pill, .back-link, .nav-menu__item, .status-bar__link, .button[href$='.html'], .site-footer__legal a[href$='.html']");
   if (!links.length) return;
 
   links.forEach((link) => {

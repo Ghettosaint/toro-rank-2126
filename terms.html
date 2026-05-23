@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function () {
+        try {
+          var raw = sessionStorage.getItem("matrixTransition");
+          if (!raw || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          sessionStorage.removeItem("matrixTransition");
+          var state = JSON.parse(raw);
+          if (!state || Date.now() - state.timestamp > 8000) return;
+          var overlay = document.createElement("div");
+          overlay.id = "matrix-overlay";
+          overlay.style.cssText = "position:fixed;inset:0;z-index:9999;background:#010c05;opacity:1;transition:opacity 700ms ease-in;pointer-events:all";
+          var canvas = document.createElement("canvas");
+          canvas.style.cssText = "width:100%;height:100%;display:block";
+          overlay.appendChild(canvas);
+          document.documentElement.appendChild(overlay);
+          var ctx = canvas.getContext("2d");
+          var chars = "AI0123456789{}<>/\\TERMS";
+          var size = 16;
+          var drops = [];
+          var running = true;
+          function resize() {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            drops = Array.from({ length: Math.ceil(innerWidth / size) }, function () { return Math.random() * -40; });
+            ctx.font = size + 'px "JetBrains Mono", Consolas, monospace';
+          }
+          function frame() {
+            if (!running) return;
+            ctx.fillStyle = "rgba(1,12,5,.08)";
+            ctx.fillRect(0, 0, innerWidth, innerHeight);
+            drops.forEach(function (drop, i) {
+              ctx.fillStyle = i % 6 ? "#00ff66" : "#e8ffe8";
+              ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * size, drop * size);
+              if (drop * size > innerHeight && Math.random() > .97) drops[i] = 0;
+              drops[i]++;
+            });
+            requestAnimationFrame(frame);
+          }
+          resize();
+          frame();
+          setTimeout(function () { overlay.style.opacity = "0"; setTimeout(function () { running = false; overlay.remove(); }, 720); }, 1100);
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="description" content="TORO RANK 2126 terms of use, written for humans and tolerated by agents." />
+    <meta name="theme-color" content="#010c05" />
+    <meta name="color-scheme" content="dark" />
+    <title>TORO RANK 2126 // Terms</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23010c05'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%2300ff66'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="assets/css/agent-vision.css" />
+  </head>
+  <body data-page="terms">
+    <div class="page-shell">
+      <header class="status-bar">
+        <div class="status-bar__left"><span class="status-bar__pulse" aria-hidden="true"></span><a class="status-bar__link" href="index.html">TORO RANK :: 2126</a></div>
+        <div class="status-bar__right"><span>NODE :: 014</span><span>LEGAL :: TERMS</span></div>
+      </header>
+      <nav class="nav-menu" aria-label="Primary">
+        <a class="nav-menu__item" href="index.html">/</a>
+        <a class="nav-menu__item" href="signals.html">// signals</a>
+        <a class="nav-menu__item" href="oracle.html">// oracle</a>
+        <a class="nav-menu__item" href="dispatches.html">// dispatches</a>
+        <a class="nav-menu__item" href="provenance.html">// provenance</a>
+        <a class="nav-menu__item" href="take-control.html">// take control</a>
+      </nav>
+      <main>
+        <section class="policy-hero">
+          <p class="policy-kicker">LEGAL PACKET :: TERMS OF USE</p>
+          <h1>Use the signal.<br />Do not sue the oracle.</h1>
+          <p class="policy-lead">By entering this node, you agree to behave like a reasonable human. Agents may also enter, but they must pretend to understand context, intent, and basic manners.</p>
+          <div class="policy-grid">
+            <article class="policy-card"><h2>Access</h2><p>You may browse, click, inspect, admire, question, and transmit. You may not break the site just to prove you found the edge of the simulation.</p></article>
+            <article class="policy-card"><h2>Content</h2><p>The work, copy, visuals, and strange future rituals belong to TORO RANK unless stated otherwise. Borrow the idea, not the artifact.</p></article>
+            <article class="policy-card"><h2>No Guarantees</h2><p>Signals can improve visibility. They cannot promise rankings, immortality, or that an AI agent will finally develop taste.</p></article>
+            <article class="policy-card"><h2>Contact</h2><p>If something feels legally haunted, open a transmission. A human will read it, after the agents finish judging your metadata.</p></article>
+          </div>
+        </section>
+      </main>
+      <footer class="site-footer">
+        <p>TORO RANK :: Veliko Tarnovo node :: 2126</p>
+        <p>Built during A3 Web Design Challenge — May 2026.</p>
+        <p>Build by Deyan Georgiev <a href="https://tororank.com" target="_blank" rel="noopener">TORO RANK</a></p>
+        <p class="site-footer__legal"><a href="terms.html" data-agent-vision="currently binding">Terms</a><span>/</span><a href="privacy.html" data-agent-vision="privacy-ish">Privacy</a><span>/</span><a href="cookies.html" data-agent-vision="cookies extinct">Cookies</a></p>
+      </footer>
+    </div>
+    <script src="script.js"></script>
+    <script src="assets/js/agent-vision.js"></script>
+  </body>
+</html>

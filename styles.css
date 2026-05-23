@@ -252,7 +252,8 @@ body[data-page="provenance"] .nav-menu__item[href="provenance.html"] {
 }
 
 body[data-page="signals"] .nav-menu__item[href="signals.html"],
-body[data-page="oracle"] .nav-menu__item[href="oracle.html"] {
+body[data-page="oracle"] .nav-menu__item[href="oracle.html"],
+body[data-page="dispatches"] .nav-menu__item[href="dispatches.html"] {
   color: var(--text-bright);
   text-shadow: var(--glow-sm);
 }
@@ -2788,6 +2789,131 @@ body[data-page="agent"] main::after {
 .site-footer p {
   margin: 0;
   color: var(--text-muted);
+}
+
+.site-footer--home {
+  margin-top: 1rem;
+}
+
+.site-footer__legal {
+  width: 100%;
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 0.8rem;
+  border-top: 1px dashed rgba(0, 255, 102, 0.16);
+}
+
+.site-footer__legal a {
+  position: relative;
+  color: var(--green-300);
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-footer__legal a:hover {
+  color: var(--text-bright);
+  text-shadow: var(--glow-sm);
+}
+
+.site-footer__legal span {
+  color: var(--text-dim);
+}
+
+body.agent-vision-active .site-footer__legal a::after {
+  content: attr(data-agent-vision);
+  display: inline-block;
+  margin-left: 0.55rem;
+  color: var(--green-500);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  opacity: 0.78;
+}
+
+/* -------------------------------------------------------------
+ * Policy pages
+ * ------------------------------------------------------------- */
+.policy-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background:
+    linear-gradient(135deg, rgba(0, 255, 102, 0.13), rgba(1, 12, 5, 0.88)),
+    repeating-linear-gradient(90deg, rgba(0, 255, 102, 0.08) 0 1px, transparent 1px 72px),
+    var(--surface);
+  padding: clamp(2rem, 6vw, 4.5rem);
+  min-height: 62vh;
+}
+
+.policy-hero::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(circle at 22% 18%, rgba(232, 255, 232, 0.14), transparent 24%),
+    radial-gradient(circle at 80% 64%, rgba(0, 255, 102, 0.16), transparent 30%);
+  animation: policyScan 9s linear infinite;
+  pointer-events: none;
+}
+
+.policy-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.policy-kicker {
+  color: var(--green-300);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 1.4rem;
+}
+
+.policy-lead {
+  max-width: 66ch;
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-top: 1.6rem;
+}
+
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 2.4rem;
+}
+
+.policy-card {
+  border: 1px solid var(--border-strong);
+  background: rgba(2, 22, 7, 0.82);
+  padding: 1.2rem;
+  min-height: 150px;
+  box-shadow: inset 0 0 24px rgba(0, 255, 102, 0.04);
+}
+
+.policy-card h2 {
+  font-size: 1rem;
+  color: var(--text-bright);
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.02em;
+}
+
+.policy-card p,
+.policy-card li {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.policy-card ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+@keyframes policyScan {
+  from { transform: translate3d(-3%, -2%, 0) rotate(0deg); }
+  to { transform: translate3d(3%, 2%, 0) rotate(360deg); }
 }
 
 /* -------------------------------------------------------------

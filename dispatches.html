@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script>
+      (function () {
+        try {
+          var raw = sessionStorage.getItem("matrixTransition");
+          if (!raw) return;
+          sessionStorage.removeItem("matrixTransition");
+          if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          var state; try { state = JSON.parse(raw); } catch (e) { return; }
+          if (!state || Date.now() - state.timestamp > 8000) return;
+          var overlay = document.createElement("div");
+          overlay.id = "matrix-overlay";
+          overlay.style.cssText = "position:fixed;inset:0;z-index:9999;background:#010c05;pointer-events:all;opacity:1;transition:opacity 700ms ease-in;";
+          document.documentElement.appendChild(overlay);
+          var canvas = document.createElement("canvas");
+          canvas.style.cssText = "width:100%;height:100%;display:block;";
+          canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+          overlay.appendChild(canvas);
+          var ctx = canvas.getContext("2d");
+          var FS = 16;
+          var CHARS = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789";
+          var columns = Math.floor(canvas.width / FS);
+          var drops = new Array(columns);
+          for (var i = 0; i < columns; i++) drops[i] = Math.random() * -50;
+          ctx.font = FS + 'px "JetBrains Mono", Consolas, monospace';
+          ctx.textBaseline = "top";
+          var rafId = null; var stopped = false;
+          function frame() {
+            if (stopped) return;
+            ctx.fillStyle = "rgba(1,12,5,0.08)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (var j = 0; j < drops.length; j++) {
+              var x = j * FS; var y = drops[j] * FS;
+              ctx.fillStyle = "#e8ffe8";
+              ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, y);
+              ctx.fillStyle = "#00ff66";
+              ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, y - FS);
+              if (y > canvas.height && Math.random() > 0.975) drops[j] = 0;
+              drops[j]++;
+            }
+            rafId = requestAnimationFrame(frame);
+          }
+          frame();
+          setTimeout(function () {
+            overlay.style.opacity = "0";
+            setTimeout(function () {
+              stopped = true;
+              if (rafId) cancelAnimationFrame(rafId);
+              if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }, 700);
+          }, 1200);
+        } catch (e) {}
+      })();
+    </script>
+
+    <meta name="description" content="Dispatches — field record of agent-web work by TORO RANK 2126. Schema, migration, recovery, endpoint architecture artifacts." />
+    <meta name="theme-color" content="#010c05" />
+    <meta name="color-scheme" content="dark" />
+    <meta property="og:title" content="TORO RANK 2126 — Dispatches" />
+    <meta property="og:description" content="Field record. Eight agent-web artifacts." />
+    <meta property="og:type" content="website" />
+
+    <title>TORO RANK 2126 // Dispatches</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23010c05'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%2300ff66'/%3E%3C/svg%3E" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
+
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="assets/css/agent-vision.css" />
+
+    <style>
+      /* Dispatches grid — visual portfolio of field artifacts */
+      .dispatches__lead {
+        color: var(--text-muted);
+        max-width: 60ch;
+        margin-bottom: 3rem;
+        font-size: 1.05rem;
+      }
+
+      .dispatches__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+      }
+
+      .dispatch {
+        position: relative;
+        background: var(--surface);
+        border: 1px solid var(--border-strong);
+        padding: 1.6rem 1.4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        min-height: 240px;
+        transition:
+          border-color var(--dur-fast) var(--ease-out),
+          transform var(--dur-med) var(--ease-out),
+          box-shadow var(--dur-med) var(--ease-out);
+      }
+
+      .dispatch::before,
+      .dispatch::after {
+        content: "";
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border: 1.5px solid var(--green-500);
+        opacity: 0;
+        transition: opacity 0.4s var(--ease-out);
+        pointer-events: none;
+        box-shadow: 0 0 6px rgba(0, 255, 102, 0.45);
+      }
+      .dispatch::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+      .dispatch::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+      .dispatch:hover {
+        border-color: var(--green-500);
+        transform: translateY(-5px);
+        box-shadow:
+          0 12px 32px rgba(0, 0, 0, 0.4),
+          0 0 24px rgba(0, 255, 102, 0.2);
+      }
+      .dispatch:hover::before,
+      .dispatch:hover::after { opacity: 1; }
+
+      .dispatch__head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px dashed var(--border);
+      }
+
+      .dispatch__id {
+        font-size: 0.7rem;
+        color: var(--green-500);
+        text-shadow: var(--glow-sm);
+        letter-spacing: 0.18em;
+      }
+
+      .dispatch__class {
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      .dispatch__title {
+        font-size: 1.05rem;
+        color: var(--text-bright);
+        margin: 0;
+        text-shadow: var(--glow-sm);
+      }
+
+      .dispatch__body {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        margin: 0;
+        line-height: 1.55;
+      }
+
+      .dispatch__meta {
+        margin-top: auto;
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+
+      .dispatch__tag {
+        font-size: 0.65rem;
+        color: var(--green-300);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.15rem 0.5rem;
+        border: 1px solid var(--border-strong);
+        background: rgba(0, 255, 102, 0.05);
+      }
+
+      .dispatch__code {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--green-700);
+        padding: 0.4rem 0.6rem;
+        background: rgba(0, 0, 0, 0.3);
+        border-left: 2px solid var(--green-500);
+        margin: 0.2rem 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .dispatches__footer {
+        margin-top: 4rem;
+        padding: 2rem;
+        border: 1px dashed var(--border-strong);
+        color: var(--text-muted);
+        text-align: center;
+        font-style: normal;
+      }
+      .dispatches__footer p {
+        margin: 0 auto;
+        max-width: 56ch;
+      }
+
+      .dispatch {
+        perspective: 1200px;
+        padding: 0;
+        cursor: pointer;
+        min-height: 335px;
+        background:
+          linear-gradient(135deg, rgba(0, 255, 102, 0.12), rgba(2, 22, 7, 0.86)),
+          var(--surface);
+      }
+
+      .dispatch__inner {
+        position: relative;
+        min-height: 335px;
+        transform-style: preserve-3d;
+        transition: transform 720ms cubic-bezier(0.2, 0, 0.2, 1);
+      }
+
+      .dispatch:hover .dispatch__inner,
+      .dispatch:focus-visible .dispatch__inner {
+        transform: rotateY(180deg);
+      }
+
+      .dispatch__face {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        padding: 1.6rem 1.4rem;
+        backface-visibility: hidden;
+        overflow: hidden;
+      }
+
+      .dispatch__face--front {
+        justify-content: center;
+        padding-top: 1.35rem;
+        padding-bottom: 1.35rem;
+      }
+
+      .dispatch__face--front .dispatch__meta {
+        margin-top: 0.15rem;
+      }
+
+      .dispatch__face::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(180deg, transparent 0 10px, rgba(0, 255, 102, 0.06) 11px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s var(--ease-out);
+      }
+
+      .dispatch:hover .dispatch__face::after,
+      .dispatch:focus-visible .dispatch__face::after {
+        opacity: 1;
+      }
+
+      .dispatch__face--back {
+        justify-content: space-between;
+        transform: rotateY(180deg);
+        background:
+          radial-gradient(circle at 20% 20%, rgba(232, 255, 232, 0.13), transparent 26%),
+          linear-gradient(145deg, rgba(0, 255, 102, 0.2), rgba(1, 12, 5, 0.92));
+      }
+
+      .dispatch__back-label,
+      .dispatch__open {
+        color: var(--green-500);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        font-size: 0.72rem;
+      }
+
+      .dispatch__face--back p {
+        color: var(--text-bright);
+        font-size: 0.98rem;
+        line-height: 1.55;
+        text-shadow: var(--glow-sm);
+      }
+
+      .dispatch__back-score {
+        display: block;
+        width: fit-content;
+        border: 1px solid var(--green-500);
+        background: rgba(0, 255, 102, 0.08);
+        padding: 0.5rem 0.7rem;
+      }
+
+      .dispatch-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 220ms var(--ease-out);
+      }
+
+      .dispatch-modal.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .dispatch-modal__backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(1, 12, 5, 0.86);
+        backdrop-filter: blur(6px);
+      }
+
+      .dispatch-modal__panel {
+        position: relative;
+        width: min(760px, calc(100vw - 2rem));
+        max-height: min(720px, calc(100vh - 2rem));
+        overflow: hidden;
+        border: 1px solid var(--green-500);
+        background: rgba(2, 22, 7, 0.96);
+        padding: clamp(1.5rem, 4vw, 2.6rem);
+        padding-top: clamp(3.2rem, 5vw, 4rem);
+        box-shadow:
+          0 0 0 1px rgba(232, 255, 232, 0.08),
+          0 0 55px rgba(0, 255, 102, 0.22);
+      }
+
+      .dispatch-modal__rain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.22;
+        pointer-events: none;
+      }
+
+      .dispatch-modal__panel > *:not(.dispatch-modal__rain) {
+        position: relative;
+        z-index: 1;
+      }
+
+      .dispatch-modal__close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: auto;
+        z-index: 5;
+        width: 2.4rem;
+        height: 2.4rem;
+        border: 1px solid var(--green-500);
+        border-top: 0;
+        border-right: 0;
+        background: rgba(1, 12, 5, 0.92);
+        color: var(--text-bright);
+        font: inherit;
+        cursor: pointer;
+        box-shadow: 0 0 18px rgba(0, 255, 102, 0.18);
+      }
+
+      .dispatch-modal__close:hover {
+        background: rgba(0, 255, 102, 0.18);
+        text-shadow: var(--glow-sm);
+      }
+
+      .dispatch-modal__eyebrow {
+        color: var(--green-300);
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        font-size: 0.78rem;
+      }
+
+      .dispatch-modal h2 {
+        color: var(--text-bright);
+        margin: 0.8rem 0 1rem 0;
+      }
+
+      .dispatch-modal__outcome {
+        color: var(--text-muted);
+        font-size: 1rem;
+      }
+
+      .dispatch-modal__steps {
+        margin: 1.4rem 0;
+        padding-left: 1.2rem;
+        color: var(--green-300);
+      }
+
+      .dispatch-modal__steps li {
+        margin: 0.55rem 0;
+      }
+
+      .dispatch-modal__score {
+        display: inline-block;
+        border-left: 2px solid var(--green-500);
+        background: rgba(0, 0, 0, 0.34);
+        padding: 0.65rem 0.85rem;
+      }
+
+      @media (max-width: 720px) {
+        .dispatch,
+        .dispatch__inner {
+          min-height: 380px;
+        }
+      }
+    </style>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "TORO RANK 2126 — Dispatches",
+        "description": "Field record of agent-web artifacts.",
+        "isPartOf": { "@type": "WebSite", "name": "TORO RANK 2126" },
+        "about": { "@type": "Organization", "name": "TORO RANK", "url": "https://tororank.com" }
+      }
+    </script>
+  </head>
+  <body data-page="dispatches">
+    <div class="page-shell">
+      <header class="status-bar">
+        <div class="status-bar__left">
+          <span class="status-bar__pulse" aria-hidden="true"></span>
+          <a class="status-bar__link" href="index.html">TORO RANK :: 2126</a>
+        </div>
+        <div class="status-bar__right">
+          <span>NODE :: 014</span>
+          <span>ARCHIVE :: DISPATCHES</span>
+        </div>
+      </header>
+
+      <nav class="nav-menu" aria-label="Primary">
+        <a class="nav-menu__item" href="index.html">/</a>
+        <a class="nav-menu__item" href="signals.html">// signals</a>
+        <a class="nav-menu__item" href="oracle.html">// oracle</a>
+        <a class="nav-menu__item" href="dispatches.html">// dispatches</a>
+        <a class="nav-menu__item" href="provenance.html">// provenance</a>
+        <a class="nav-menu__item" href="take-control.html">// take control</a>
+      </nav>
+
+      <div class="subpage-header">
+        <a class="back-link" href="index.html">
+          <span class="back-link__arrow" aria-hidden="true">←</span>
+          Back to the choice
+        </a>
+        <span class="subpage-label">// FIELD RECORD</span>
+      </div>
+
+      <main>
+        <section>
+          <div class="section-heading">
+            <span class="section-heading__index">/ /</span>
+            <h1>Dispatches</h1>
+          </div>
+          <p class="dispatches__lead">
+            Eight field artifacts. Each one is a class of problem solved — what the agent saw before,
+            what it saw after, what stayed durable. Names and numbers stay sealed; the shape of the
+            work does not.
+          </p>
+
+          <div class="dispatches__grid">
+
+            <article class="dispatch">
+              <div class="dispatch__head">
+                <span class="dispatch__id">DSP :: 014-α</span>
+                <span class="dispatch__class">Recovery</span>
+              </div>
+              <h2 class="dispatch__title">Index collapse · signal restored</h2>
+              <p class="dispatch__body">
+                Site lost the index after a platform shift. Canonical layer rebuilt from log signal,
+                crawl budget redirected, structured data re-anchored. Traffic curve back online inside
+                one cycle.
+              </p>
+              <code class="dispatch__code">canonical :: 4,212 paths rewritten
+crawl-budget :: +180% reclaimed</code>
+              <div class="dispatch__meta">
+                <span class="dispatch__tag">canonical</span>
+                <span class="dispatch__tag">log forensics</span>
+              </div>
+            </article>
+
+            <article class="dispatch">
+              <div class="dispatch__head">
+                <span class="dispatch__id">DSP :: 014-β</span>
+                <span class="dispatch__class">Schema</span>
+              </div>
+              <h2 class="dispatch__title">Multilingual schema network</h2>
+              <p class="dispatch__body">
+                Property data restructured for agent parsing across four locales. Schema survives
+                translation without semantic drift. Cross-market entity continuity preserved.
+              </p>
+              <code class="dispatch__code">@type :: RealEstate
+hreflang :: 4 locales · stable</code>
+              <div class="dispatch__meta">
+                <span class="dispatch__tag">schema.org</span>
+                <span class="dispatch__tag">hreflang</span>
+              </div>
+            </article>
+
+            <article class="dispatch">
+              <div class="dispatch__head">
+                <span class="dispatch__id">DSP :: 014-γ</span>
+                <span class="dispatch__class">Endpoint</span>
+              </div>
+              <h2 class="dispatch__title">MCP server · audit surface</h2>
+              <p class="dispatch__body">
+                Custom MCP server exposing crawl diagnostics, schema validity, redirect chains, and
+                Core Web Vitals to AI agents. Site became something a model could query, not just
+                scrape.
+              </p>
+              <code class="dispatch__code">mcp:// audit · 7 tools
+returns :: machine-readable</code>
+              <div class="dispatch__meta">
+                <span class="dispatch__tag">mcp</span>
+                <span class="dispatch__tag">api</span>
+              </div>
+            </article>
+
+            <article class="dispatch">
+              <div class="dispatch__head">
+                <span class="dispatch__id">DSP :: 014-δ</span>
+                <span class="dispatch__class">Migration</span>
+              </div>
+              <h2 class="dispatch__title">Site move · zero ranking decay</h2>
+              <p class="dispatch__body">
+                Large reorganization with canonical, schema, and entity continuity preserved across
+                the rebuild. Internal linking architecture migrated without breaking the equity graph.
+              </p>
+              <code class="dispatch__code">301 :: 12,800 paths mapped
+loss :: &lt; 2% within cycle</code>
+              <div class="dispatch__meta">
+                <span class="dispatch__tag">redirects</span>
+                <span class="dispatch__tag">link equity</span>
+              </div>
+            </article>
+
+            <article class="dispatch">
+              <div class="dispatch__head">
+                <span class="dispatch__id">DSP :: 014-ε</span>
+                <span class="dispatch__class">Forensics</span>
+              </div>
+              <h2 class="dispatch__title">Crawl-path forensics</h2>
+              <p class="dispatch__body">
+                Log file analysis revealing where crawler budget was bleeding into faceted noise.
+                Surface re-routed, parameter handling rewritten, agent attention restored to canonical
+                paths.
+              </p>
+              <code class="dispatch__code">noise paths :: identified
+parameter rules :: 17 new</code>
+              <div class="dispatch__meta">
+                <span class="dispatch__tag">log analysis</span>
+                <span class="dispatch__tag">facets</span>
+              </div>
+            </article>
+
+            <article class="dispatch">
+              <div class="dispatch__head">
+                <span class="dispatch__id">DSP :: 014-ζ</span>
+                <span class="dispatch__class">Latency</span>
+              </div>
+              <h2 class="dispatch__title">Render-budget engineering</h2>
+              <p class="dispatch__body">
+                LCP, INP, server response trimmed to the thresholds that decide whether agents bother
+                reading. Critical path slimmed; agent recommendation probability rose with it.
+              </p>
+              <code class="dispatch__code">LCP :: 4.2s → 1.6s
+INP :: 320ms → 110ms</code>
+              <div class="dispatch__meta">
+                <span class="dispatch__tag">core web vitals</span>
+                <span class="dispatch__tag">render</span>
+              </div>
+            </article>
+
+            <article class="dispatch">
+              <div class="dispatch__head">
+                <span class="dispatch__id">DSP :: 014-η</span>
+                <span class="dispatch__class">Entity</span>
+              </div>
+              <h2 class="dispatch__title">Entity graph cartography</h2>
+              <p class="dispatch__body">
+                Mapped a brand into the knowledge layer — sameAs, identifiers, author trail, structured
+                provenance. Agents stopped confusing the brand with similarly named entities.
+              </p>
+              <code class="dispatch__code">sameAs :: 11 anchors
+identifier :: 4 surfaces</code>
+              <div class="dispatch__meta">
+                <span class="dispatch__tag">entity</span>
+                <span class="dispatch__tag">knowledge graph</span>
+              </div>
+            </article>
+
+            <article class="dispatch">
+              <div class="dispatch__head">
+                <span class="dispatch__id">DSP :: 014-θ</span>
+                <span class="dispatch__class">Signal</span>
+              </div>
+              <h2 class="dispatch__title">Content topology · semantic clusters</h2>
+              <p class="dispatch__body">
+                Content architecture refactored into topic clusters with entity-aware internal linking.
+                Pages stopped competing with themselves; the cluster became the unit agents recommend.
+              </p>
+              <code class="dispatch__code">clusters :: 6 pillars
+internal links :: graph rebuilt</code>
+              <div class="dispatch__meta">
+                <span class="dispatch__tag">semantic seo</span>
+                <span class="dispatch__tag">topic clusters</span>
+              </div>
+            </article>
+
+          </div>
+
+          <div class="dispatches__footer">
+            <p>
+              Specific names, numbers, and counterparts stay under seal. The pattern is the point.
+              If the shape of one of these matches your problem — open a transmission.
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <a class="button" href="take-control.html">
+            Open transmission <span class="button__arrow" aria-hidden="true">→</span>
+          </a>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>TORO RANK :: Veliko Tarnovo node :: 2126</p>
+        <p>Built during A3 Web Design Challenge — May 2026.</p>
+        <p>Build by Deyan Georgiev <a href="https://tororank.com" target="_blank" rel="noopener">TORO RANK</a></p>
+        <p class="site-footer__legal">
+          <a href="terms.html" data-agent-vision="case law ignored">Terms</a>
+          <span>/</span>
+          <a href="privacy.html" data-agent-vision="redactions wink">Privacy</a>
+          <span>/</span>
+          <a href="cookies.html" data-agent-vision="crumb trail sealed">Cookies</a>
+        </p>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="assets/js/dispatches.js"></script>
+    <script src="assets/js/agent-vision.js"></script>
+  </body>
+</html>
