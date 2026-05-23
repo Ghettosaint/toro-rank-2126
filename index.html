@@ -118,10 +118,18 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
     />
+
+    <!--
+      Preload the hands GLB so the download starts during HTML parse,
+      not after Three.js finishes loading. Shaves precious seconds off
+      first-paint-to-model-visible.
+    -->
+    <link rel="preload" href="assets/hero-hands.glb" as="fetch" crossorigin="anonymous" />
 
     <link rel="stylesheet" href="styles.css" />
 

@@ -2,23 +2,23 @@
  * TORO RANK 2126 — Hero 3D scene
  *
  * Loaded only on index.html. Renders an atmospheric WebGL scene:
- *   - Procedural low-poly hands (fallback if no GLB present)
- *   - GLB model auto-loads from assets/hero-hands.glb and replaces
- *     the procedural fallback
- *   - Mouse drag rotates the model (OrbitControls)
- *   - Gentle auto-rotation when idle, hover float animation
+ *   - Loads assets/hero-hands.glb (Draco-compressed GLBs supported)
+ *   - Hover float animation on the model
+ *   - Mouse drag rotation (OrbitControls)
  *   - Particle field for atmosphere
  *
- * Pills are intentionally NOT rendered here — they'll come back
- * once the hands composition is dialled in.
+ * If the GLB fails to load, the scene shows just the particle field.
+ * No procedural fallback hands.
  *
  * Tech:
- *   - Three.js + OrbitControls via ES module import map (no build)
+ *   - Three.js + GLTFLoader + DRACOLoader + OrbitControls
+ *   - All via ES module import map (no build)
  *   - Respects prefers-reduced-motion
  */
 
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 const canvas = document.getElementById("hero-canvas");
@@ -61,18 +61,16 @@ function initHero3D() {
   renderer.toneMappingExposure = 1.15;
 
   // -------------------------------------------------------------
-  // OrbitControls — user can drag to rotate the model
+  // OrbitControls — drag to rotate the model
   // -------------------------------------------------------------
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, -0.2, 0);
-  controls.enableZoom = false;       // don't let users zoom in/out
-  controls.enablePan = false;        // no panning
-  controls.enableDamping = true;     // smooth release
+  controls.enableZoom = false;
+  controls.enablePan = false;
+  controls.enableDamping = true;
   controls.dampingFactor = 0.07;
   controls.rotateSpeed = 0.7;
-  controls.autoRotate = false;       // hands only hover; user drags to rotate
-  controls.autoRotateSpeed = 0.35;
-  // Lock the vertical angle so users can't flip the model upside down
+  controls.autoRotate = false;
   controls.minPolarAngle = Math.PI / 3.2;
   controls.maxPolarAngle = Math.PI - Math.PI / 3.2;
   controls.update();
@@ -95,133 +93,14 @@ function initHero3D() {
   scene.add(rimLight);
 
   // -------------------------------------------------------------
-  // handsContainer — wraps whatever hand representation is active
-  // (procedural fallback OR loaded GLB). The animation loop floats
-  // the container, so motion code doesn't care which is inside.
+  // handsContainer — empty until the GLB loads. The animation loop
+  // floats whatever is inside, so motion code doesn't care if the
+  // model has arrived yet.
   // -------------------------------------------------------------
   const handsContainer = new THREE.Group();
   const HANDS_BASE_Y = -0.3;
   handsContainer.position.y = HANDS_BASE_Y;
   scene.add(handsContainer);
-
-  // -------------------------------------------------------------
-  // Procedural hand factory (fallback if no GLB)
-  // -------------------------------------------------------------
-  const skinMaterial = new THREE.MeshStandardMaterial({
-    color: 0x0a2515,
-    emissive: 0x002a14,
-    emissiveIntensity: 0.35,
-    roughness: 0.6,
-    metalness: 0.35,
-    flatShading: true,
-  });
-
-  const jointMaterial = new THREE.MeshStandardMaterial({
-    color: 0x0d3a20,
-    emissive: 0x00ff66,
-    emissiveIntensity: 0.55,
-    roughness: 0.4,
-    metalness: 0.5,
-    flatShading: true,
-  });
-
-  const wristMaterial = new THREE.MeshStandardMaterial({
-    color: 0x051208,
-    emissive: 0x001a08,
-    emissiveIntensity: 0.2,
-    roughness: 0.7,
-    metalness: 0.4,
-    flatShading: true,
-    transparent: true,
-    opacity: 0.65,
-  });
-
-  function makeFingerSegment(radius, length) {
-    return new THREE.Mesh(new THREE.CapsuleGeometry(radius, length, 4, 8), skinMaterial);
-  }
-
-  function makeJoint(radius) {
-    return new THREE.Mesh(new THREE.SphereGeometry(radius, 8, 6), jointMaterial);
-  }
-
-  function makeFinger({ proximalLen, distalLen, radius, curl = 0.5 }) {
-    const finger = new THREE.Group();
-
-    const prox = makeFingerSegment(radius, proximalLen);
-    prox.position.y = proximalLen / 2;
-    finger.add(prox);
-
-    const midJoint = makeJoint(radius * 1.05);
-    midJoint.position.y = proximalLen;
-    finger.add(midJoint);
-
-    const distalGroup = new THREE.Group();
-    distalGroup.position.y = proximalLen;
-    distalGroup.rotation.x = curl;
-
-    const distal = makeFingerSegment(radius * 0.88, distalLen);
-    distal.position.y = distalLen / 2;
-    distalGroup.add(distal);
-
-    const tip = makeJoint(radius * 0.8);
-    tip.position.y = distalLen;
-    distalGroup.add(tip);
-
-    finger.add(distalGroup);
-    return finger;
-  }
-
-  function makeHand() {
-    const hand = new THREE.Group();
-
-    const palm = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.95, 0.22), skinMaterial);
-    hand.add(palm);
-
-    const fingerTopY = 0.475;
-    const fingers = [
-      { xOff: 0.3,  proximalLen: 0.32, distalLen: 0.22, radius: 0.075, curl: 0.55 },
-      { xOff: 0.1,  proximalLen: 0.36, distalLen: 0.26, radius: 0.075, curl: 0.55 },
-      { xOff: -0.1, proximalLen: 0.32, distalLen: 0.24, radius: 0.075, curl: 0.55 },
-      { xOff: -0.3, proximalLen: 0.26, distalLen: 0.20, radius: 0.07,  curl: 0.55 },
-    ];
-
-    fingers.forEach((f) => {
-      const finger = makeFinger(f);
-      finger.position.set(f.xOff, fingerTopY, 0);
-      hand.add(finger);
-
-      const baseJoint = makeJoint(f.radius * 1.15);
-      baseJoint.position.set(f.xOff, fingerTopY, 0);
-      hand.add(baseJoint);
-    });
-
-    const thumbGroup = new THREE.Group();
-    thumbGroup.position.set(0.48, 0.1, 0);
-    thumbGroup.rotation.z = -Math.PI / 2.6;
-    thumbGroup.add(makeFinger({ proximalLen: 0.28, distalLen: 0.2, radius: 0.085, curl: 0.45 }));
-    hand.add(thumbGroup);
-
-    const wrist = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.36, 0.7, 8), wristMaterial);
-    wrist.position.y = -0.7;
-    hand.add(wrist);
-
-    hand.rotation.x = -Math.PI / 7;
-    return hand;
-  }
-
-  // Procedural fallback — built in memory but only added to the
-  // scene if the GLB load fails. Prevents a flash of procedural hands
-  // before the real model arrives.
-  const proceduralHands = new THREE.Group();
-  const leftHand = makeHand();
-  leftHand.position.set(-1.3, -0.25, -0.2);
-  leftHand.rotation.y = 0.25;
-  proceduralHands.add(leftHand);
-
-  const rightHand = makeHand();
-  rightHand.position.set(1.3, -0.25, -0.2);
-  rightHand.rotation.y = -0.25;
-  proceduralHands.add(rightHand);
 
   // -------------------------------------------------------------
   // Particle field — "data dust" for atmosphere
@@ -246,15 +125,25 @@ function initHero3D() {
   scene.add(particles);
 
   // -------------------------------------------------------------
-  // Load hands GLB if present (replaces procedural fallback)
+  // Load hands GLB
+  //
+  // DRACOLoader is wired up so Draco-compressed GLBs work.
+  // Strongly recommend compressing the GLB at gltf.report.
   // -------------------------------------------------------------
+  const dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath(
+    "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/"
+  );
+
   const loader = new GLTFLoader();
+  loader.setDRACOLoader(dracoLoader);
+
   loader.load(
     "assets/hero-hands.glb",
     (gltf) => {
       const model = gltf.scene;
 
-      // Center on origin, scale to scene
+      // Center + scale to fit the scene composition
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3()).length();
       const center = box.getCenter(new THREE.Vector3());
@@ -263,24 +152,35 @@ function initHero3D() {
       const targetSize = 3.4;
       model.scale.setScalar(targetSize / size);
 
-      // The model came in facing away — flip 180° on Y to face camera.
-      // If the GLB was already correctly oriented, change to 0.
+      // Flip 180° to face camera
       model.rotation.y = Math.PI;
 
-      // Cool the model down so it doesn't overpower the palette
+      // Prepare materials for fade-in + tone down brightness
       model.traverse((node) => {
         if (node.isMesh && node.material) {
           node.material.envMapIntensity = 0.6;
+          node.material.transparent = true;
+          node.material.opacity = 0;
         }
       });
 
-      // Add the model into the animated container
       handsContainer.add(model);
+
+      // Fade in over 500ms
+      const fadeStart = performance.now();
+      const fadeMs = 500;
+      function fadeIn() {
+        const t = Math.min(1, (performance.now() - fadeStart) / fadeMs);
+        model.traverse((node) => {
+          if (node.isMesh && node.material) node.material.opacity = t;
+        });
+        if (t < 1) requestAnimationFrame(fadeIn);
+      }
+      fadeIn();
     },
     undefined,
     () => {
-      // GLB missing or failed to load — show procedural fallback.
-      handsContainer.add(proceduralHands);
+      // GLB missing or failed — scene shows particles only. Silent.
     }
   );
 
@@ -338,7 +238,7 @@ function initHero3D() {
   resize();
 
   // -------------------------------------------------------------
-  // Pause animation when the tab is hidden
+  // Pause animation when the tab is hidden (saves battery / CPU)
   // -------------------------------------------------------------
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
