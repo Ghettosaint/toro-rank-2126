@@ -114,6 +114,75 @@
 
     <link rel="stylesheet" href="styles.css" />
 
+    <!-- Structured data: ProfessionalService catalog -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "TORO RANK — Agent web services",
+        "provider": {
+          "@type": "Organization",
+          "name": "TORO RANK",
+          "url": "https://tororank.com"
+        },
+        "areaServed": "Worldwide",
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Agent web services",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Agent legibility tuning",
+                "description": "Schema, MCP, A2A. Make pages legible to AI agents that decide whether to recommend them."
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Site forensics",
+                "description": "Full technical SEO audit. Crawl budget, index integrity, redirect chains, Core Web Vitals."
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Signal generation",
+                "description": "Semantic SEO content. Topic clusters, entity-aware copy, internal linking that compounds."
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Endpoint architecture",
+                "description": "Custom MCP servers and structured APIs that turn your site into something agents can call directly."
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Migration routing",
+                "description": "Site moves with canonical, schema, and entity continuity preserved across the rebuild."
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Latency engineering",
+                "description": "Core Web Vitals, INP, server response — speed thresholds that decide whether content gets read."
+              }
+            }
+          ]
+        }
+      }
+    </script>
+
     <!-- Import map for Three.js — needed for the bull head scene -->
     <script type="importmap">
       {

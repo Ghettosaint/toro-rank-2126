@@ -133,6 +133,47 @@
 
     <link rel="stylesheet" href="styles.css" />
 
+    <!-- Structured data: WebSite + Organization -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "name": "TORO RANK 2126",
+            "description": "The Last SEO Consultant — a portfolio from the agentic web.",
+            "inLanguage": "en",
+            "publisher": { "@type": "Organization", "name": "TORO RANK" }
+          },
+          {
+            "@type": "Organization",
+            "name": "TORO RANK",
+            "url": "https://tororank.com",
+            "founder": {
+              "@type": "Person",
+              "name": "Deyan Georgiev",
+              "jobTitle": "Technical SEO consultant"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Veliko Tarnovo",
+              "addressCountry": "BG"
+            },
+            "areaServed": "Worldwide",
+            "knowsAbout": [
+              "Technical SEO",
+              "Schema.org structured data",
+              "Model Context Protocol",
+              "Agent-to-Agent communication",
+              "Semantic SEO",
+              "Crawl diagnostics",
+              "Agent-readable endpoints"
+            ]
+          }
+        ]
+      }
+    </script>
+
     <!--
       Import map for Three.js — runs straight in the browser, no build step.
       The map lets the hero-3d.js module write clean `import ... from "three"` syntax.

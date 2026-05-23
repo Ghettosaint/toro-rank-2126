@@ -37,9 +37,9 @@ import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 //     agent.html#rot=0,1.57,0       (90° Y — turn right)
 //     agent.html#rot=0,-1.57,0      (-90° Y — turn left)
 // =============================================================
-const BULL_HEAD_ROT_X = 0;
-const BULL_HEAD_ROT_Y = Math.PI;
-const BULL_HEAD_ROT_Z = 0;
+const BULL_HEAD_ROT_X = Math.PI;
+const BULL_HEAD_ROT_Y = 0.4;
+const BULL_HEAD_ROT_Z = Math.PI;
 
 /** Read rotation override from URL hash if present. */
 function readRotationOverride() {
@@ -239,7 +239,9 @@ function initAgentScene() {
       const nx = (e.clientX / window.innerWidth) * 2 - 1;
       const ny = (e.clientY / window.innerHeight) * 2 - 1;
       targetRotY = nx * MAX_ROT_Y;
-      targetRotX = -ny * MAX_ROT_X; // invert Y so looking up = up
+      // Mouse down → head looks down; mouse up → head looks up.
+      // (Sign matches the vertex rotation baked into the model.)
+      targetRotX = ny * MAX_ROT_X;
       mouseActive = true;
       lastMouseMove = performance.now();
     });
