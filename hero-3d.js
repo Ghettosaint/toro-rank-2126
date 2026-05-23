@@ -28,6 +28,31 @@ if (canvas) {
 
 function initHero3D() {
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const host = canvas.closest(".choice");
+  const status = document.querySelector("[data-hero-3d-status]");
+
+  function setStatus(text) {
+    if (status) status.textContent = text;
+  }
+
+  function setProgress(value) {
+    if (host) host.style.setProperty("--hero-3d-progress", `${Math.max(0.08, value) * 100}%`);
+  }
+
+  function markLoaded() {
+    host?.classList.remove("is-3d-loading", "is-3d-fallback");
+    host?.classList.add("is-3d-loaded");
+  }
+
+  function markFallback(message) {
+    setStatus(message);
+    host?.classList.remove("is-3d-loading");
+    host?.classList.add("is-3d-fallback");
+  }
+
+  host?.classList.add("is-3d-loading");
+  setProgress(0.1);
+  setStatus("3D signal booting");
 
   // -------------------------------------------------------------
   // Scene + Camera + Renderer
@@ -53,9 +78,11 @@ function initHero3D() {
     });
   } catch (err) {
     console.info("WebGL unavailable; hero scene skipped.");
+    markFallback("WebGL unavailable");
     return;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const maxPixelRatio = window.innerWidth < 720 ? 1.25 : 1.75;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
   renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
@@ -138,9 +165,18 @@ function initHero3D() {
   const loader = new GLTFLoader();
   loader.setDRACOLoader(dracoLoader);
 
+  const fallbackTimer = window.setTimeout(() => {
+    if (!host?.classList.contains("is-3d-loaded")) {
+      markFallback("3D model still streaming");
+    }
+  }, 6500);
+
   loader.load(
     "assets/hero-hands.glb",
     (gltf) => {
+      window.clearTimeout(fallbackTimer);
+      setProgress(1);
+      setStatus("3D signal locked");
       const model = gltf.scene;
 
       // Center + scale to fit the scene composition
@@ -165,6 +201,7 @@ function initHero3D() {
       });
 
       handsContainer.add(model);
+      markLoaded();
 
       // Fade in over 500ms
       const fadeStart = performance.now();
@@ -178,8 +215,16 @@ function initHero3D() {
       }
       fadeIn();
     },
-    undefined,
+    (event) => {
+      if (!event.total) {
+        setProgress(0.45);
+        return;
+      }
+      setProgress(Math.min(0.96, event.loaded / event.total));
+    },
     () => {
+      window.clearTimeout(fallbackTimer);
+      markFallback("3D model unavailable");
       // GLB missing or failed — scene shows particles only. Silent.
     }
   );

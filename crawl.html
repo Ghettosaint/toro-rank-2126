@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Phase B of the matrix transition — full inline, no dependency on script.js. -->
     <script>
       (function () {
         try {
@@ -31,7 +30,7 @@
           overlay.id = "matrix-overlay";
           overlay.style.cssText =
             "position:fixed;inset:0;z-index:9999;background:#010c05;" +
-            "pointer-events:all;opacity:1;transition:opacity 700ms ease-in;";
+            "pointer-events:all;opacity:1;transition:opacity 1100ms ease-out;";
           document.documentElement.appendChild(overlay);
 
           var canvas = document.createElement("canvas");
@@ -42,11 +41,24 @@
 
           var ctx = canvas.getContext("2d");
           var FS = 16;
-          var CHARS =
-            "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789";
+          var CHARS = "アイウエオカキクケコサシスセソタチツテト0123456789";
+          function seededRandom(seed) {
+            var value = Math.floor(seed) % 2147483647;
+            if (value <= 0) value += 2147483646;
+            return function () {
+              value = (value * 16807) % 2147483647;
+              return (value - 1) / 2147483646;
+            };
+          }
+          var seed = state.seed || state.startedAt || state.timestamp || Date.now();
+          var startedAt = state.startedAt || state.timestamp || Date.now();
+          var rnd = seededRandom(seed);
+          var elapsedFrames = Math.floor(Math.max(0, Date.now() - startedAt) / 16);
           var columns = Math.floor(canvas.width / FS);
           var drops = new Array(columns);
-          for (var i = 0; i < columns; i++) drops[i] = Math.random() * -50;
+          for (var i = 0; i < columns; i++) {
+            drops[i] = rnd() * (canvas.height / FS) - 50 + elapsedFrames;
+          }
           ctx.font = FS + 'px "JetBrains Mono", Consolas, monospace';
           ctx.textBaseline = "top";
 
@@ -63,11 +75,7 @@
               ctx.fillStyle = "#e8ffe8";
               ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, y);
               ctx.fillStyle = "#00ff66";
-              ctx.fillText(
-                CHARS[Math.floor(Math.random() * CHARS.length)],
-                x,
-                y - FS
-              );
+              ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, y - FS);
               if (y > canvas.height && Math.random() > 0.975) drops[j] = 0;
               drops[j]++;
             }
@@ -81,21 +89,24 @@
               stopped = true;
               if (rafId) cancelAnimationFrame(rafId);
               if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-            }, 700);
-          }, 1200);
+            }, 1150);
+          }, 420);
         } catch (e) {}
       })();
     </script>
 
     <meta
       name="description"
-      content="Crawl — play as an AI agent navigating a 2026 website. A live demonstration of the agentic web by TORO RANK 2126."
+      content="Crawl the old web: ten blue links, ten fake sites, and the surface agents had to outgrow."
     />
     <meta name="theme-color" content="#010c05" />
     <meta name="color-scheme" content="dark" />
 
     <meta property="og:title" content="TORO RANK 2126 — /crawl" />
-    <meta property="og:description" content="Play as the agent. 60 seconds. One mechanic." />
+    <meta
+      property="og:description"
+      content="Ten blue links from the old web. Open them and watch the simulation leak."
+    />
     <meta property="og:type" content="website" />
 
     <title>TORO RANK 2126 // /crawl</title>
@@ -114,17 +125,13 @@
 
     <link rel="stylesheet" href="styles.css" />
 
-    <!-- Structured data: Game -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Game",
+        "@type": "CreativeWork",
         "name": "Crawl",
-        "description": "Play as an AI crawler navigating a 2126 website. Collect structured-data signals across five HTML5 semantic layers. Sixty seconds. One mechanic.",
-        "genre": "Arcade",
-        "gamePlatform": "Web browser",
-        "applicationCategory": "Game",
-        "operatingSystem": "Any"
+        "description": "A simulated old-web search surface with ten blue links and fake websites.",
+        "genre": "Interactive web fiction"
       }
     </script>
   </head>
@@ -137,15 +144,14 @@
         </div>
         <div class="status-bar__right">
           <span>NODE :: 014</span>
-          <span>PILL :: BLUE</span>
+          <span>ARCHIVE :: OLD WEB</span>
         </div>
       </header>
 
-      <!-- Centered nav menu — shared across all pages -->
       <nav class="nav-menu" aria-label="Primary">
         <a class="nav-menu__item" href="index.html">/</a>
-        <a class="nav-menu__item" href="agent.html">// agent</a>
-        <a class="nav-menu__item" href="crawl.html">// crawl</a>
+        <a class="nav-menu__item" href="signals.html">// signals</a>
+        <a class="nav-menu__item" href="oracle.html">// oracle</a>
         <a class="nav-menu__item" href="provenance.html">// provenance</a>
         <a class="nav-menu__item" href="take-control.html">// take control</a>
       </nav>
@@ -155,7 +161,7 @@
           <span class="back-link__arrow" aria-hidden="true">←</span>
           Back to the choice
         </a>
-        <span class="subpage-label">// THE SIMULATION</span>
+        <span class="subpage-label">// THE OLD SURFACE</span>
       </div>
 
       <main>
@@ -165,25 +171,50 @@
             <h2>/crawl</h2>
           </div>
           <p>
-            You stayed in the simulation. Play as the agent — navigate a 2026 website, collect
-            structured-data tokens, dodge broken redirects. Sixty seconds. One mechanic. Built for
-            one keystroke.
+            You stayed in the simulation. Ten blue links. Ten doors into the web that looked
+            readable to humans, and mostly opaque to everything else.
           </p>
         </section>
 
-        <!-- The game itself. crawl-game.js mounts on this canvas. -->
-        <section>
-          <div class="crawl-stage" id="crawl-stage">
-            <canvas
-              id="crawl-canvas"
-              aria-label="Crawl — a 60-second game. Use up and down arrows to switch lanes, space to start."
-              tabindex="0"
-            ></canvas>
+        <section class="old-web" aria-label="Old web search results simulation">
+          <div class="old-web__chrome">
+            <div class="old-web__brand">G00GLE_2026</div>
+            <form class="old-web__search" role="search">
+              <input type="search" value="why is my website invisible to ai" aria-label="Search query" readonly />
+              <button type="button">Search</button>
+            </form>
+            <p class="old-web__meta">About 10 results (0.42 seconds)</p>
           </div>
-          <p class="crawl-hint">
-            <span class="mono">↑ ↓</span> shift layers · <span class="mono">SPACE</span> initiate
-            · <span class="mono">touch</span> upper or lower half on mobile
-          </p>
+
+          <ol class="old-web__results">
+            <li><button type="button" class="old-link" data-site="agency"><span class="old-link__title">Best SEO Agency for AI Search Visibility | RankFastPro</span><span class="old-link__url">https://rankfastpro.example/ai-seo-services</span><span class="old-link__snippet">We help brands rank higher with proven packages, proprietary methods, and a free audit.</span></button></li>
+            <li><button type="button" class="old-link" data-site="blog"><span class="old-link__title">What Is Agentic SEO? Complete Guide for 2026</span><span class="old-link__url">https://content-harbor.example/blog/agentic-seo-guide</span><span class="old-link__snippet">Everything you need to know about AI crawlers, entity signals, schema, and the future of search.</span></button></li>
+            <li><button type="button" class="old-link" data-site="tool"><span class="old-link__title">Free AI Visibility Checker - Scan Your Site Now</span><span class="old-link__url">https://visibility-checker.example</span><span class="old-link__snippet">Enter your URL and discover whether AI assistants can understand your business.</span></button></li>
+            <li><button type="button" class="old-link" data-site="forum"><span class="old-link__title">My traffic disappeared after AI answers launched - Webmaster Forum</span><span class="old-link__url">https://forum.example/thread/traffic-disappeared</span><span class="old-link__snippet">Nobody clicked anything this month. Is this happening to anyone else?</span></button></li>
+            <li><button type="button" class="old-link" data-site="directory"><span class="old-link__title">Top 100 AI SEO Companies Near You</span><span class="old-link__url">https://top-vendors.example/ai-seo</span><span class="old-link__snippet">Compare verified vendors, sponsored placements, star ratings, and popular service bundles.</span></button></li>
+            <li><button type="button" class="old-link" data-site="pdf"><span class="old-link__title">PDF: Enterprise AI Search Readiness Checklist</span><span class="old-link__url">https://assets.example/checklist-v7-final.pdf</span><span class="old-link__snippet">A downloadable checklist for marketing teams preparing for AI search disruption.</span></button></li>
+            <li><button type="button" class="old-link" data-site="shop"><span class="old-link__title">Buy Schema Markup Templates - Instant Download</span><span class="old-link__url">https://schema-shop.example/templates</span><span class="old-link__snippet">Plug-and-play JSON-LD snippets for local businesses, SaaS, ecommerce, and authors.</span></button></li>
+            <li><button type="button" class="old-link" data-site="news"><span class="old-link__title">Search Is Dead Again, Experts Say</span><span class="old-link__url">https://daily-index.example/search-is-dead-again</span><span class="old-link__snippet">Analysts predict a major shift as AI assistants become the first layer of discovery.</span></button></li>
+            <li><button type="button" class="old-link" data-site="local"><span class="old-link__title">Technical SEO Consultant in Veliko Tarnovo</span><span class="old-link__url">https://local-pack.example/bg/technical-seo</span><span class="old-link__snippet">Map result, call button, opening hours, and three reviews from people who may or may not exist.</span></button></li>
+            <li><button type="button" class="old-link" data-site="ghost"><span class="old-link__title">Untitled</span><span class="old-link__url">https://cached.example/404/entity-not-found</span><span class="old-link__snippet">This result has no visible owner, no stable entity, and no reason to be trusted.</span></button></li>
+          </ol>
+
+          <div class="fake-site" id="fakeSite" hidden>
+            <div class="fake-site__backdrop" data-close-fake-site></div>
+            <article class="fake-site__window" role="dialog" aria-modal="true" aria-labelledby="fakeSiteTitle">
+              <header class="fake-site__bar">
+                <div class="fake-site__dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                <span class="fake-site__address" id="fakeSiteUrl"></span>
+                <button type="button" class="fake-site__close" data-close-fake-site aria-label="Close fake website">×</button>
+              </header>
+              <div class="fake-site__body">
+                <p class="fake-site__tag" id="fakeSiteTag"></p>
+                <h3 id="fakeSiteTitle"></h3>
+                <p id="fakeSiteBody"></p>
+                <div class="fake-site__noise" id="fakeSiteNoise"></div>
+              </div>
+            </article>
+          </div>
         </section>
       </main>
 

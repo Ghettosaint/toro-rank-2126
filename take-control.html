@@ -31,7 +31,7 @@
           overlay.id = "matrix-overlay";
           overlay.style.cssText =
             "position:fixed;inset:0;z-index:9999;background:#010c05;" +
-            "pointer-events:all;opacity:1;transition:opacity 700ms ease-in;";
+            "pointer-events:all;opacity:1;transition:opacity 1100ms ease-out;";
           document.documentElement.appendChild(overlay);
 
           var canvas = document.createElement("canvas");
@@ -44,9 +44,23 @@
           var FS = 16;
           var CHARS =
             "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789";
+          function seededRandom(seed) {
+            var value = Math.floor(seed) % 2147483647;
+            if (value <= 0) value += 2147483646;
+            return function () {
+              value = (value * 16807) % 2147483647;
+              return (value - 1) / 2147483646;
+            };
+          }
+          var seed = state.seed || state.startedAt || state.timestamp || Date.now();
+          var startedAt = state.startedAt || state.timestamp || Date.now();
+          var rnd = seededRandom(seed);
+          var elapsedFrames = Math.floor(Math.max(0, Date.now() - startedAt) / 16);
           var columns = Math.floor(canvas.width / FS);
           var drops = new Array(columns);
-          for (var i = 0; i < columns; i++) drops[i] = Math.random() * -50;
+          for (var i = 0; i < columns; i++) {
+            drops[i] = rnd() * (canvas.height / FS) - 50 + elapsedFrames;
+          }
           ctx.font = FS + 'px "JetBrains Mono", Consolas, monospace';
           ctx.textBaseline = "top";
 
@@ -81,8 +95,8 @@
               stopped = true;
               if (rafId) cancelAnimationFrame(rafId);
               if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-            }, 700);
-          }, 1200);
+            }, 1150);
+          }, 420);
         } catch (e) {}
       })();
     </script>
@@ -152,8 +166,8 @@
       <!-- Centered nav menu — shared across all pages -->
       <nav class="nav-menu" aria-label="Primary">
         <a class="nav-menu__item" href="index.html">/</a>
-        <a class="nav-menu__item" href="agent.html">// agent</a>
-        <a class="nav-menu__item" href="crawl.html">// crawl</a>
+        <a class="nav-menu__item" href="signals.html">// signals</a>
+        <a class="nav-menu__item" href="oracle.html">// oracle</a>
         <a class="nav-menu__item" href="provenance.html">// provenance</a>
         <a class="nav-menu__item" href="take-control.html">// take control</a>
       </nav>
@@ -177,12 +191,169 @@
 
         <!-- The form -->
         <section class="control-section">
-          <form class="control-form" id="controlForm" novalidate>
+          <form class="control-form control-form--handshake" id="controlForm" novalidate>
+            <div class="handshake-grid">
+              <div class="handshake-panel handshake-panel--input">
+                <div class="handshake-panel__head">
+                  <span>// 01</span>
+                  <strong>classify distortion</strong>
+                </div>
+
+                <div class="control-form__row">
+                  <span class="control-form__label">Signal anomaly</span>
+                  <div class="control-form__options" role="radiogroup" aria-label="Signal anomaly">
+                    <label class="control-form__option">
+                      <input type="radio" name="subject" value="agent-invisibility" checked />
+                      <span>Agent cannot explain us</span>
+                    </label>
+                    <label class="control-form__option">
+                      <input type="radio" name="subject" value="entity-mismatch" />
+                      <span>Entity mismatch</span>
+                    </label>
+                    <label class="control-form__option">
+                      <input type="radio" name="subject" value="crawler-loop" />
+                      <span>Crawler loop</span>
+                    </label>
+                    <label class="control-form__option">
+                      <input type="radio" name="subject" value="index-collapse" />
+                      <span>Index collapse</span>
+                    </label>
+                    <label class="control-form__option">
+                      <input type="radio" name="subject" value="latency-decay" />
+                      <span>Latency decay</span>
+                    </label>
+                    <label class="control-form__option">
+                      <input type="radio" name="subject" value="provenance-gap" />
+                      <span>Provenance gap</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="control-form__row">
+                  <label class="control-form__label" for="cf-url">Target surface</label>
+                  <div class="scan-input">
+                    <input
+                      type="url"
+                      id="cf-url"
+                      name="url"
+                      autocomplete="url"
+                      placeholder="https://"
+                      class="control-form__input"
+                    />
+                    <button type="button" class="scan-input__button" id="scanButton">scan</button>
+                  </div>
+                  <div class="scan-lines" id="scanLines" aria-live="polite">
+                    <span>semantic surface idle</span>
+                    <span>agent legibility unknown</span>
+                    <span>recommendation probability unmeasured</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="handshake-panel handshake-panel--input">
+                <div class="handshake-panel__head">
+                  <span>// 02</span>
+                  <strong>bind operator</strong>
+                </div>
+
+                <div class="control-form__row">
+                  <label class="control-form__label" for="cf-name">Operator handle</label>
+                  <input
+                    type="text"
+                    id="cf-name"
+                    name="name"
+                    required
+                    autocomplete="name"
+                    placeholder="Designation"
+                    class="control-form__input"
+                  />
+                </div>
+
+                <div class="control-form__row">
+                  <label class="control-form__label" for="cf-email">Return channel</label>
+                  <input
+                    type="email"
+                    id="cf-email"
+                    name="email"
+                    required
+                    autocomplete="email"
+                    placeholder="encrypted@channel"
+                    class="control-form__input"
+                  />
+                </div>
+
+                <div class="control-form__row">
+                  <label class="control-form__label" for="cf-message">Human residue</label>
+                  <textarea
+                    id="cf-message"
+                    name="message"
+                    required
+                    rows="5"
+                    placeholder="What changed? What vanished? What should an agent understand?"
+                    class="control-form__input control-form__textarea"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="handshake-panel handshake-panel--packet">
+                <div class="handshake-panel__head">
+                  <span>// 03</span>
+                  <strong>live packet</strong>
+                </div>
+
+                <div class="packet-preview" aria-live="polite">
+                  <div class="packet-preview__row">
+                    <span>NODE</span>
+                    <strong data-packet-field="node">operator.pending</strong>
+                  </div>
+                  <div class="packet-preview__row">
+                    <span>TARGET</span>
+                    <strong data-packet-field="target">surface.unbound</strong>
+                  </div>
+                  <div class="packet-preview__row">
+                    <span>FAILURE</span>
+                    <strong data-packet-field="failure">agent cannot explain us</strong>
+                  </div>
+                  <div class="packet-preview__row">
+                    <span>URGENCY</span>
+                    <strong data-packet-field="urgency">rising</strong>
+                  </div>
+                  <div class="packet-preview__row packet-preview__row--wide">
+                    <span>REQUEST</span>
+                    <strong data-packet-field="request">make this surface readable to machines</strong>
+                  </div>
+                </div>
+
+                <div class="handshake-meter" aria-hidden="true">
+                  <span style="--i: 1"></span>
+                  <span style="--i: 2"></span>
+                  <span style="--i: 3"></span>
+                  <span style="--i: 4"></span>
+                  <span style="--i: 5"></span>
+                  <span style="--i: 6"></span>
+                  <span style="--i: 7"></span>
+                  <span style="--i: 8"></span>
+                </div>
+
+                <button type="submit" class="control-form__submit">
+                  <span class="control-form__submit-label">Sign packet</span>
+                  <span class="control-form__submit-arrow" aria-hidden="true">в†’</span>
+                </button>
+
+                <p class="control-form__note">
+                  The packet opens a real return channel to deyan@tororank.com. No backend, no
+                  stored residue.
+                </p>
+              </div>
+            </div>
+          </form>
+
+          <form class="control-form control-form--legacy" aria-hidden="true" hidden novalidate>
             <div class="control-form__row">
-              <label class="control-form__label" for="cf-name">// 01 · Identity</label>
+              <label class="control-form__label" for="legacy-cf-name">// 01 · Identity</label>
               <input
                 type="text"
-                id="cf-name"
+                id="legacy-cf-name"
                 name="name"
                 required
                 autocomplete="name"
@@ -192,10 +363,10 @@
             </div>
 
             <div class="control-form__row">
-              <label class="control-form__label" for="cf-email">// 02 · Return channel</label>
+              <label class="control-form__label" for="legacy-cf-email">// 02 · Return channel</label>
               <input
                 type="email"
-                id="cf-email"
+                id="legacy-cf-email"
                 name="email"
                 required
                 autocomplete="email"
@@ -235,10 +406,10 @@
             </div>
 
             <div class="control-form__row">
-              <label class="control-form__label" for="cf-url">// 04 · Target URL</label>
+              <label class="control-form__label" for="legacy-cf-url">// 04 · Target URL</label>
               <input
                 type="url"
-                id="cf-url"
+                id="legacy-cf-url"
                 name="url"
                 autocomplete="url"
                 placeholder="https://"
@@ -247,9 +418,9 @@
             </div>
 
             <div class="control-form__row">
-              <label class="control-form__label" for="cf-message">// 05 · Transmission</label>
+              <label class="control-form__label" for="legacy-cf-message">// 05 · Transmission</label>
               <textarea
-                id="cf-message"
+                id="legacy-cf-message"
                 name="message"
                 required
                 rows="6"
@@ -272,6 +443,9 @@
           <!-- Success overlay — shown after successful submit -->
           <div class="control-success" id="controlSuccess" aria-live="polite" hidden>
             <div class="control-success__inner">
+              <button class="control-success__close" type="button" id="controlSuccessClose" aria-label="Close transmission confirmation">
+                ×
+              </button>
               <p class="control-success__status">// transmission confirmed</p>
               <h2 class="control-success__headline" data-final="CHANNEL ESTABLISHED.">
                 CHANNEL ESTABLISHED.

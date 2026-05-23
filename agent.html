@@ -31,7 +31,7 @@
           overlay.id = "matrix-overlay";
           overlay.style.cssText =
             "position:fixed;inset:0;z-index:9999;background:#010c05;" +
-            "pointer-events:all;opacity:1;transition:opacity 700ms ease-in;";
+            "pointer-events:all;opacity:1;transition:opacity 1100ms ease-out;";
           document.documentElement.appendChild(overlay);
 
           var canvas = document.createElement("canvas");
@@ -44,9 +44,23 @@
           var FS = 16;
           var CHARS =
             "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789";
+          function seededRandom(seed) {
+            var value = Math.floor(seed) % 2147483647;
+            if (value <= 0) value += 2147483646;
+            return function () {
+              value = (value * 16807) % 2147483647;
+              return (value - 1) / 2147483646;
+            };
+          }
+          var seed = state.seed || state.startedAt || state.timestamp || Date.now();
+          var startedAt = state.startedAt || state.timestamp || Date.now();
+          var rnd = seededRandom(seed);
+          var elapsedFrames = Math.floor(Math.max(0, Date.now() - startedAt) / 16);
           var columns = Math.floor(canvas.width / FS);
           var drops = new Array(columns);
-          for (var i = 0; i < columns; i++) drops[i] = Math.random() * -50;
+          for (var i = 0; i < columns; i++) {
+            drops[i] = rnd() * (canvas.height / FS) - 50 + elapsedFrames;
+          }
           ctx.font = FS + 'px "JetBrains Mono", Consolas, monospace';
           ctx.textBaseline = "top";
 
@@ -81,8 +95,8 @@
               stopped = true;
               if (rafId) cancelAnimationFrame(rafId);
               if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-            }, 700);
-          }, 1200);
+            }, 1150);
+          }, 420);
         } catch (e) {}
       })();
     </script>
@@ -107,6 +121,22 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/DRACOLoader.js"
+      crossorigin="anonymous"
+    />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
@@ -213,8 +243,8 @@
       <!-- Centered nav menu — shared across all pages -->
       <nav class="nav-menu" aria-label="Primary">
         <a class="nav-menu__item" href="index.html">/</a>
-        <a class="nav-menu__item" href="agent.html">// agent</a>
-        <a class="nav-menu__item" href="crawl.html">// crawl</a>
+        <a class="nav-menu__item" href="signals.html">// signals</a>
+        <a class="nav-menu__item" href="oracle.html">// oracle</a>
         <a class="nav-menu__item" href="provenance.html">// provenance</a>
         <a class="nav-menu__item" href="take-control.html">// take control</a>
       </nav>
@@ -261,7 +291,16 @@
               Loads assets/bull-head.glb if present; otherwise the scene
               shows only the particle field.
             -->
+            <div class="agent-hero__fallback" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
             <canvas id="agent-canvas" aria-hidden="true"></canvas>
+            <div class="agent-hero__loading" aria-hidden="true">
+              <span class="agent-hero__loading-bar"></span>
+              <span class="agent-hero__loading-text" data-agent-3d-status>bull model waking</span>
+            </div>
           </div>
         </section>
 
@@ -388,34 +427,36 @@
           </div>
         </section>
 
-        <!-- 04 // Field log — concrete missions, proof of capability -->
-        <section id="field-log" class="reveal field-log">
+        <!-- 04 // Agent readiness protocol -->
+        <section id="agent-protocol" class="reveal field-log">
           <div class="section-heading">
             <span class="section-heading__index">04 //</span>
-            <h2>Field log</h2>
+            <h2>Agent protocol</h2>
           </div>
-          <p class="field-log__lead">Three logs. Type-redacted. Mission shape only.</p>
+          <p class="field-log__lead">The sequence. How a site becomes legible before a human arrives.</p>
           <ol class="field-log__list">
             <li class="field-log__entry">
               <span class="field-log__id">LOG :: 014-α</span>
               <p class="field-log__body">
-                Site recovered after index collapse. Crawl signal restored,
-                canonical layer rebuilt, traffic curve back online.
+                Reduce the business to a stable machine-readable identity:
+                who it is, what it offers, where proof lives, and which names
+                must resolve to the same thing.
               </p>
             </li>
             <li class="field-log__entry">
               <span class="field-log__id">LOG :: 014-β</span>
               <p class="field-log__body">
-                Service architecture rebuilt machine-readable. Pricing,
-                inventory, and authority exposed as structured signals that
-                agents can call without scraping the page.
+                Align schema, headings, internal links, feeds, and endpoints
+                so the agent can verify the claim without reverse-engineering
+                the design.
               </p>
             </li>
             <li class="field-log__entry">
               <span class="field-log__id">LOG :: 014-γ</span>
               <p class="field-log__body">
-                Entities, schemas, and internal links mapped for AI discovery.
-                The site became something a model can summarize in ten tokens.
+                Remove ambiguity from the path between page, proof, and answer.
+                If the agent cannot defend the recommendation, it will not
+                make one.
               </p>
             </li>
           </ol>

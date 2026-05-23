@@ -61,6 +61,31 @@ function initAgentScene() {
   const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   ).matches;
+  const host = canvas.closest(".agent-hero__visual");
+  const status = document.querySelector("[data-agent-3d-status]");
+
+  function setStatus(text) {
+    if (status) status.textContent = text;
+  }
+
+  function setProgress(value) {
+    if (host) host.style.setProperty("--agent-3d-progress", `${Math.max(0.08, value) * 100}%`);
+  }
+
+  function markLoaded() {
+    host?.classList.remove("is-3d-loading", "is-3d-fallback");
+    host?.classList.add("is-3d-loaded");
+  }
+
+  function markFallback(message) {
+    setStatus(message);
+    host?.classList.remove("is-3d-loading");
+    host?.classList.add("is-3d-fallback");
+  }
+
+  host?.classList.add("is-3d-loading");
+  setProgress(0.08);
+  setStatus("bull model waking");
 
   // -------------------------------------------------------------
   // Scene + Camera + Renderer
@@ -86,27 +111,29 @@ function initAgentScene() {
     });
   } catch (err) {
     console.info("WebGL unavailable; agent scene skipped.");
+    markFallback("WebGL unavailable");
     return;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const maxPixelRatio = window.innerWidth < 720 ? 1.25 : 1.75;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
   renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  renderer.toneMappingExposure = 1.45;
 
   // -------------------------------------------------------------
   // Lights — cinematic, lean into green rim
   // -------------------------------------------------------------
-  scene.add(new THREE.AmbientLight(0x0a1810, 0.3));
+  scene.add(new THREE.AmbientLight(0x102416, 0.58));
 
-  const keyLight = new THREE.DirectionalLight(0xffffff, 0.6);
+  const keyLight = new THREE.DirectionalLight(0xffffff, 0.9);
   keyLight.position.set(-2, 4, 3);
   scene.add(keyLight);
 
-  const rimLight = new THREE.DirectionalLight(0x00ff66, 0.7);
+  const rimLight = new THREE.DirectionalLight(0x00ff66, 0.95);
   rimLight.position.set(3, 0, -4);
   scene.add(rimLight);
 
-  const fillLight = new THREE.DirectionalLight(0x4ab8ff, 0.15);
+  const fillLight = new THREE.DirectionalLight(0x6dff8e, 0.28);
   fillLight.position.set(2, -2, 3);
   scene.add(fillLight);
 
@@ -150,9 +177,18 @@ function initAgentScene() {
   const loader = new GLTFLoader();
   loader.setDRACOLoader(dracoLoader);
 
+  const fallbackTimer = window.setTimeout(() => {
+    if (!host?.classList.contains("is-3d-loaded")) {
+      markFallback("bull model still streaming");
+    }
+  }, 7500);
+
   loader.load(
     "assets/bull-head.glb",
     (gltf) => {
+      window.clearTimeout(fallbackTimer);
+      setProgress(1);
+      setStatus("bull model locked");
       const model = gltf.scene;
 
       // Center + scale
@@ -170,7 +206,6 @@ function initAgentScene() {
       const rx = override ? override.x : BULL_HEAD_ROT_X;
       const ry = override ? override.y : BULL_HEAD_ROT_Y;
       const rz = override ? override.z : BULL_HEAD_ROT_Z;
-      console.info("[bull-head] rotation:", rx, ry, rz);
 
       model.traverse((node) => {
         if (node.isMesh && node.geometry) {
@@ -191,12 +226,17 @@ function initAgentScene() {
       model.traverse((node) => {
         if (node.isMesh && node.material) {
           node.material.envMapIntensity = 0.7;
+          if ("emissive" in node.material) {
+            node.material.emissive = new THREE.Color(0x06240f);
+            node.material.emissiveIntensity = 0.18;
+          }
           node.material.transparent = true;
           node.material.opacity = 0;
         }
       });
 
       headContainer.add(model);
+      markLoaded();
 
       // Fade in
       const fadeStart = performance.now();
@@ -210,8 +250,16 @@ function initAgentScene() {
       }
       fadeIn();
     },
-    undefined,
+    (event) => {
+      if (!event.total) {
+        setProgress(0.45);
+        return;
+      }
+      setProgress(Math.min(0.96, event.loaded / event.total));
+    },
     () => {
+      window.clearTimeout(fallbackTimer);
+      markFallback("bull model unavailable");
       // GLB missing — show nothing, particles carry the scene.
     }
   );

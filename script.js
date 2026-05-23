@@ -164,12 +164,21 @@ const MATRIX_CHARS =
   "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789";
 
 // Phase timing (tweak here, don't hunt for magic numbers)
-const MATRIX_BEFORE_NAV_MS = 700;   // rain visible on old page before navigation
-const MATRIX_AFTER_NAV_MS = 1200;   // rain on new page before fade-out begins
-const MATRIX_FADE_OUT_MS = 700;     // overlay fades to reveal new content
+const MATRIX_BEFORE_NAV_MS = 720;   // rain visible on old page before navigation
+const MATRIX_AFTER_NAV_MS = 420;    // rain settles on new page before reveal begins
+const MATRIX_FADE_OUT_MS = 1100;    // overlay fades to reveal new content
 const MATRIX_MAX_AGE_MS = 8000;     // stale flag guard — overlay never gets stuck
 
 const SESSION_KEY = "matrixTransition";
+
+function createSeededRandom(seed) {
+  let value = Math.floor(seed) % 2147483647;
+  if (value <= 0) value += 2147483646;
+  return () => {
+    value = (value * 16807) % 2147483647;
+    return (value - 1) / 2147483646;
+  };
+}
 
 /**
  * Build the full-viewport DOM overlay + canvas.
@@ -184,7 +193,7 @@ function createMatrixOverlay(initialOpacity) {
     "z-index: 9999",
     "background: #010c05",
     `opacity: ${initialOpacity}`,
-    "transition: opacity 220ms ease-out",
+    "transition: opacity 260ms ease-out",
     "pointer-events: all",
   ].join(";");
 
@@ -201,11 +210,17 @@ function createMatrixOverlay(initialOpacity) {
  * Start the rain animation on a canvas. Returns a cleanup function
  * that cancels the rAF loop when called.
  */
-function startMatrixRain(canvas) {
+function startMatrixRain(canvas, options = {}) {
   const ctx = canvas.getContext("2d");
   const columns = Math.floor(canvas.width / MATRIX_FONT_SIZE);
-  // Stagger initial positions so columns don't move in sync
-  const drops = new Array(columns).fill(0).map(() => Math.random() * -50);
+  const startedAt = options.startedAt || Date.now();
+  const random = createSeededRandom(options.seed || startedAt);
+  const elapsedFrames = Math.floor(Math.max(0, Date.now() - startedAt) / 16);
+  // Seeded starting positions let the next page continue the same rain
+  // pattern instead of visibly starting a second, unrelated storm.
+  const drops = new Array(columns)
+    .fill(0)
+    .map(() => random() * (canvas.height / MATRIX_FONT_SIZE) - 50 + elapsedFrames);
 
   ctx.font = `${MATRIX_FONT_SIZE}px "JetBrains Mono", Consolas, monospace`;
   ctx.textBaseline = "top";
@@ -259,6 +274,8 @@ function startMatrixRain(canvas) {
  * Fades in rain, stashes state, navigates after a short delay.
  */
 function playMatrixTransition(href) {
+  const startedAt = Date.now();
+  const seed = Math.floor(Math.random() * 1000000000);
   const overlay = createMatrixOverlay(0);
   document.body.appendChild(overlay);
 
@@ -267,13 +284,13 @@ function playMatrixTransition(href) {
   overlay.offsetWidth;
   overlay.style.opacity = "1";
 
-  startMatrixRain(overlay.querySelector("canvas"));
+  startMatrixRain(overlay.querySelector("canvas"), { seed, startedAt });
 
   // Stash state so the new page can resume the transition
   try {
     sessionStorage.setItem(
       SESSION_KEY,
-      JSON.stringify({ timestamp: Date.now(), href })
+      JSON.stringify({ timestamp: startedAt, startedAt, seed, href })
     );
   } catch {
     // sessionStorage unavailable (private mode quirks) — fine, we'll just
@@ -313,7 +330,14 @@ function bindBfcacheCleanup() {
   });
 
   window.addEventListener("pagehide", () => {
-    // Don't let the in-progress overlay get cached with the page
+    // During an intentional matrix transition, keep the old page covered
+    // until the browser commits the next document. Removing it here causes
+    // the old page to flash for a frame before the new page takes over.
+    try {
+      if (sessionStorage.getItem(SESSION_KEY)) return;
+    } catch {}
+
+    // For ordinary page-cache cases, don't let a stray overlay get cached.
     const stray = document.getElementById("matrix-overlay");
     if (stray) stray.remove();
   });
@@ -324,7 +348,7 @@ function bindBfcacheCleanup() {
  * trigger the transition. Defensive — does nothing if none exist.
  */
 function bindMatrixTransition() {
-  const links = document.querySelectorAll(".pill, .back-link");
+  const links = document.querySelectorAll(".pill, .back-link, .nav-menu__item, .status-bar__link, .button[href$='.html']");
   if (!links.length) return;
 
   links.forEach((link) => {

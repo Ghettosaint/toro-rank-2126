@@ -38,7 +38,7 @@
           overlay.id = "matrix-overlay";
           overlay.style.cssText =
             "position:fixed;inset:0;z-index:9999;background:#010c05;" +
-            "pointer-events:all;opacity:1;transition:opacity 700ms ease-in;";
+            "pointer-events:all;opacity:1;transition:opacity 1100ms ease-out;";
           document.documentElement.appendChild(overlay);
 
           var canvas = document.createElement("canvas");
@@ -52,9 +52,23 @@
           var FS = 16;
           var CHARS =
             "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789";
+          function seededRandom(seed) {
+            var value = Math.floor(seed) % 2147483647;
+            if (value <= 0) value += 2147483646;
+            return function () {
+              value = (value * 16807) % 2147483647;
+              return (value - 1) / 2147483646;
+            };
+          }
+          var seed = state.seed || state.startedAt || state.timestamp || Date.now();
+          var startedAt = state.startedAt || state.timestamp || Date.now();
+          var rnd = seededRandom(seed);
+          var elapsedFrames = Math.floor(Math.max(0, Date.now() - startedAt) / 16);
           var columns = Math.floor(canvas.width / FS);
           var drops = new Array(columns);
-          for (var i = 0; i < columns; i++) drops[i] = Math.random() * -50;
+          for (var i = 0; i < columns; i++) {
+            drops[i] = rnd() * (canvas.height / FS) - 50 + elapsedFrames;
+          }
           ctx.font = FS + 'px "JetBrains Mono", Consolas, monospace';
           ctx.textBaseline = "top";
 
@@ -90,8 +104,8 @@
               stopped = true;
               if (rafId) cancelAnimationFrame(rafId);
               if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-            }, 700);
-          }, 1200);
+            }, 1150);
+          }, 420);
         } catch (e) {}
       })();
     </script>
@@ -104,11 +118,11 @@
     <meta name="color-scheme" content="dark" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="TORO RANK 2126 — Two webs" />
-    <meta property="og:description" content="One you play. The other plays through you." />
+    <meta property="og:title" content="TORO RANK 2126 — Agent-readable SEO" />
+    <meta property="og:description" content="Make your site legible to the agents that read it first." />
     <meta property="og:type" content="website" />
 
-    <title>TORO RANK 2126 // Two webs</title>
+    <title>TORO RANK 2126 // Agent-readable SEO</title>
 
     <!-- Favicon: acid green pulse on near-black -->
     <link
@@ -119,6 +133,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/DRACOLoader.js"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js"
+      crossorigin="anonymous"
+    />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
@@ -204,8 +238,8 @@
       <!-- Centered nav menu — shared across all pages -->
       <nav class="nav-menu" aria-label="Primary">
         <a class="nav-menu__item" href="index.html">/</a>
-        <a class="nav-menu__item" href="agent.html">// agent</a>
-        <a class="nav-menu__item" href="crawl.html">// crawl</a>
+        <a class="nav-menu__item" href="signals.html">// signals</a>
+        <a class="nav-menu__item" href="oracle.html">// oracle</a>
         <a class="nav-menu__item" href="provenance.html">// provenance</a>
         <a class="nav-menu__item" href="take-control.html">// take control</a>
       </nav>
@@ -217,27 +251,34 @@
           hands GLB at assets/hero-hands.glb. Decorative — the CSS pill
           CTAs below handle all real navigation.
         -->
+        <div class="choice__fallback" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
         <canvas class="choice__canvas" id="hero-canvas" aria-hidden="true"></canvas>
+        <div class="choice__loading" aria-hidden="true">
+          <span class="choice__loading-bar"></span>
+          <span class="choice__loading-text" data-hero-3d-status>3D signal booting</span>
+        </div>
 
         <div class="choice__intro">
           <p class="choice__eyebrow">TORO RANK :: 2126</p>
-          <h1 class="choice__title">Two webs.<br />Only one is yours.</h1>
-          <p class="choice__sub">
-            One you play. The other plays through you.
-          </p>
+          <h1 class="choice__title">Make your site<br />legible to agents.</h1>
+          <p class="choice__category">A3 category :: 2126 portfolio</p>
         </div>
 
         <div class="choice__pills">
           <!-- Loop → crawl.html (the game; the repeating pattern you remain inside of) -->
           <a class="pill pill--loop" href="crawl.html" aria-label="Take the loop — play the simulation">
-            <span class="pill__label">Loop</span>
-            <span class="pill__sub">// stay</span>
+            <span class="pill__label">Crawl the old web</span>
+            <span class="pill__sub">// ten blue doors</span>
           </a>
 
           <!-- Signal → agent.html (the transmission; what is actually being broadcast) -->
           <a class="pill pill--signal" href="agent.html" aria-label="Take the signal — see the agent web">
-            <span class="pill__label">Signal</span>
-            <span class="pill__sub">// see</span>
+            <span class="pill__label">Follow the signal</span>
+            <span class="pill__sub">// agent-readable future</span>
           </a>
         </div>
 
