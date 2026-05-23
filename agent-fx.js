@@ -126,10 +126,31 @@
   }
 
   // -------------------------------------------------------------
+  // Random chip flicker
+  //
+  // Every ~2.5 seconds, pick a random signals chip and briefly
+  // highlight it. Reads as "data point activating" — gives the
+  // page ambient motion without being distracting.
+  // -------------------------------------------------------------
+  function startRandomFlicker() {
+    const chips = document.querySelectorAll(".signals__list li");
+    if (!chips.length || prefersReducedMotion) return;
+
+    setInterval(() => {
+      // Skip flicker when tab is hidden — no point burning cycles
+      if (document.hidden) return;
+      const chip = chips[Math.floor(Math.random() * chips.length)];
+      chip.classList.add("is-flickering");
+      setTimeout(() => chip.classList.remove("is-flickering"), 700);
+    }, 2500);
+  }
+
+  // -------------------------------------------------------------
   // Init
   // -------------------------------------------------------------
   bindDecode();
   bootOnVisible(document.querySelectorAll(".service"));
   bootOnVisible(document.querySelectorAll(".signals__list li"));
   bootOnVisible(document.querySelectorAll(".field-log__entry"));
+  startRandomFlicker();
 })();

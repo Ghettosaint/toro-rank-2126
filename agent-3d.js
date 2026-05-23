@@ -131,6 +131,9 @@ function initAgentScene() {
       const targetSize = 3.4;
       model.scale.setScalar(targetSize / size);
 
+      // Bull head GLB came in facing backwards — flip 180° to face camera
+      model.rotation.y = Math.PI;
+
       // Prepare materials for fade-in
       model.traverse((node) => {
         if (node.isMesh && node.material) {
