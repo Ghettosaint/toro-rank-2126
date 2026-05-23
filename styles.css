@@ -205,11 +205,24 @@ body[data-page="take-control"] .nav-menu__item[href="take-control.html"] {
   text-shadow: var(--glow-sm);
 }
 
+@media (max-width: 720px) {
+  .nav-menu {
+    gap: 1.2rem;
+    font-size: 0.78rem;
+  }
+}
+
 @media (max-width: 560px) {
   .nav-menu {
-    gap: 1rem;
-    font-size: 0.8rem;
+    gap: 0.8rem;
+    font-size: 0.72rem;
   }
+}
+
+/* Provenance page — about-style content section */
+body[data-page="provenance"] .nav-menu__item[href="provenance.html"] {
+  color: var(--text-bright);
+  text-shadow: var(--glow-sm);
 }
 
 /* -------------------------------------------------------------
@@ -1066,6 +1079,81 @@ section {
 .js-ready .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* -------------------------------------------------------------
+ * Provenance — about / archive page
+ * ------------------------------------------------------------- */
+.prov-hero {
+  margin-bottom: 5rem;
+}
+
+.prov-hero__title {
+  margin-bottom: 1.5rem;
+}
+
+.prov-hero__sub {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  max-width: 60ch;
+}
+
+.prov-body {
+  max-width: 64ch;
+}
+
+.prov-body p {
+  margin-bottom: 1.1rem;
+}
+
+.prov-name {
+  color: var(--text-bright);
+  text-shadow: var(--glow-sm);
+  font-weight: 600;
+}
+
+.prov-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+}
+
+.prov-meta__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.prov-meta__label {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.prov-meta__value {
+  color: var(--text-bright);
+  font-size: 0.98rem;
+}
+
+.prov-stance__line {
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+.prov-stance__close {
+  margin-top: 1.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--green-500);
+  color: var(--green-300);
+  font-size: 1rem;
 }
 
 /* -------------------------------------------------------------

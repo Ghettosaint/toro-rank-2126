@@ -348,7 +348,125 @@ function bindMatrixTransition() {
 /* -------------------------------------------------------------
  * Init
  * ------------------------------------------------------------- */
+/* -------------------------------------------------------------
+ * Decode-everything
+ *
+ * Site-wide character decode effect — matches the agent-page heading
+ * decode but applied to a wide set of text elements across every
+ * page. Triggered on viewport entry (visible-on-load elements get
+ * the effect immediately via the observer's first callback).
+ *
+ * Only decodes elements whose content is a single text node — we
+ * skip anything with HTML structure (h1 with <br>, etc.) so we don't
+ * destroy markup.
+ * ------------------------------------------------------------- */
+
+const DECODE_POOL =
+  "アイウエオカキクケコサシスセソタチツテト0123456789@#${}<>/[];:";
+
+const DECODE_SELECTORS = [
+  "h2", "h3", "h4",
+  ".nav-menu__item",
+  ".pill__label", ".pill__sub",
+  ".choice__eyebrow", ".choice__sub", ".choice__footer-line", ".choice__footer-sub",
+  ".subpage-label",
+  ".back-link",
+  ".section-heading__index",
+  ".signals__list li",
+  ".field-log__id",
+  ".service__title", ".service__alias",
+  ".control-hero__sub",
+  ".control-form__label",
+  ".manifesto__lead",
+  ".prov-hero__sub",
+  ".prov-stance__line",
+  ".prov-meta__label", ".prov-meta__value",
+  ".prov-name",
+  ".status-bar__link",
+  ".status-bar__left span:not(.status-bar__pulse)",
+  ".status-bar__right span",
+  ".channel__lead", ".channel__footnote",
+  ".field-log__lead",
+  ".signals__lead",
+];
+
+function decodeElement(element) {
+  if (element.dataset.decoded === "true") return;
+
+  // Skip elements with non-text children — would destroy structure
+  for (const child of element.childNodes) {
+    if (child.nodeType !== Node.TEXT_NODE && child.nodeType !== Node.COMMENT_NODE) {
+      element.dataset.decoded = "true";
+      return;
+    }
+  }
+
+  const finalText = element.textContent || "";
+  if (!finalText.trim() || finalText.length < 2) {
+    element.dataset.decoded = "true";
+    return;
+  }
+
+  element.dataset.decoded = "true";
+
+  const chars = Array.from(finalText);
+  const duration = Math.min(1000, 240 + chars.length * 22);
+  const startTime = performance.now();
+
+  function frame() {
+    const t = Math.min(1, (performance.now() - startTime) / duration);
+    const lockedCount = Math.floor(t * chars.length);
+
+    const display = chars
+      .map((target, i) => {
+        if (i < lockedCount) return target;
+        if (target === " " || target === "\n" || target === "\t") return target;
+        return DECODE_POOL[Math.floor(Math.random() * DECODE_POOL.length)];
+      })
+      .join("");
+
+    element.textContent = display;
+
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      element.textContent = finalText;
+    }
+  }
+
+  frame();
+}
+
+function setupDecodeAll() {
+  if (prefersReducedMotion) return;
+
+  const elements = document.querySelectorAll(DECODE_SELECTORS.join(","));
+  if (!elements.length) return;
+
+  if (!("IntersectionObserver" in window)) {
+    elements.forEach((el) => decodeElement(el));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        decodeElement(entry.target);
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.15 }
+  );
+
+  elements.forEach((el) => observer.observe(el));
+}
+
+/* -------------------------------------------------------------
+ * Init
+ * ------------------------------------------------------------- */
 runBootSequence();
 setupRevealAnimations();
 bindMatrixTransition();
 bindBfcacheCleanup();
+setupDecodeAll();

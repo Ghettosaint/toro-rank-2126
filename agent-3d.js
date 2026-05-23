@@ -22,19 +22,35 @@ import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 // =============================================================
 // BULL HEAD INITIAL ORIENTATION
 //
-// Tweak these three values in radians if the head loads facing
-// the wrong way. Most common useful values:
+// Applied directly to the model's vertex data (geometry.rotate*)
+// rather than as a transform — guarantees the rotation sticks
+// regardless of how the GLB exporter set up the node hierarchy.
 //
-//   0          = no rotation on that axis
-//   Math.PI    = 180° flip
-//   Math.PI/2  = 90° turn (clockwise looking down +axis)
-//   -Math.PI/2 = 90° turn the other way
-//
-// Y = yaw (turn left/right), X = pitch (tilt up/down), Z = roll.
+// URL HASH DEBUG MODE:
+//   Append #rot=X,Y,Z to the URL to override these at runtime.
+//   Values are in radians. Examples:
+//     agent.html#rot=0,0,0          (no rotation)
+//     agent.html#rot=3.14,0,0       (180° X — flip vertically)
+//     agent.html#rot=0,3.14,0       (180° Y — turn around)
+//     agent.html#rot=1.57,0,0       (90° X — tilt forward)
+//     agent.html#rot=-1.57,0,0      (-90° X — tilt back)
+//     agent.html#rot=0,1.57,0       (90° Y — turn right)
+//     agent.html#rot=0,-1.57,0      (-90° Y — turn left)
 // =============================================================
-const BULL_HEAD_ROT_X = -Math.PI / 2;
+const BULL_HEAD_ROT_X = Math.PI / 2;
 const BULL_HEAD_ROT_Y = 0;
 const BULL_HEAD_ROT_Z = 0;
+
+/** Read rotation override from URL hash if present. */
+function readRotationOverride() {
+  const m = window.location.hash.match(/rot=(-?\d+\.?\d*),(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (!m) return null;
+  return {
+    x: parseFloat(m[1]),
+    y: parseFloat(m[2]),
+    z: parseFloat(m[3]),
+  };
+}
 
 const canvas = document.getElementById("agent-canvas");
 if (canvas) {
@@ -148,8 +164,28 @@ function initAgentScene() {
       const targetSize = 3.4;
       model.scale.setScalar(targetSize / size);
 
-      // Apply initial orientation (tweak constants at top of file if wrong)
-      model.rotation.set(BULL_HEAD_ROT_X, BULL_HEAD_ROT_Y, BULL_HEAD_ROT_Z);
+      // Apply rotation to vertex data, not transform — guarantees it
+      // applies regardless of the GLB's internal node hierarchy.
+      const override = readRotationOverride();
+      const rx = override ? override.x : BULL_HEAD_ROT_X;
+      const ry = override ? override.y : BULL_HEAD_ROT_Y;
+      const rz = override ? override.z : BULL_HEAD_ROT_Z;
+      console.info("[bull-head] rotation:", rx, ry, rz);
+
+      model.traverse((node) => {
+        if (node.isMesh && node.geometry) {
+          if (rx !== 0) node.geometry.rotateX(rx);
+          if (ry !== 0) node.geometry.rotateY(ry);
+          if (rz !== 0) node.geometry.rotateZ(rz);
+        }
+      });
+      // Reset any transform rotation that might conflict
+      model.rotation.set(0, 0, 0);
+
+      // Recompute bounding box after geometry rotation
+      const newBox = new THREE.Box3().setFromObject(model);
+      const newCenter = newBox.getCenter(new THREE.Vector3());
+      model.position.sub(newCenter);
 
       // Prepare materials for fade-in
       model.traverse((node) => {

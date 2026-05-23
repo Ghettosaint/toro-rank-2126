@@ -89,16 +89,16 @@
 
     <meta
       name="description"
-      content="Take control — open transmission to TORO RANK 2126. Tell us your site anomaly, agent-readiness problem, or invisibility issue."
+      content="Provenance — where the signal came from. Origin, operator, node, stance of TORO RANK 2126."
     />
     <meta name="theme-color" content="#010c05" />
     <meta name="color-scheme" content="dark" />
 
-    <meta property="og:title" content="TORO RANK 2126 — Take control" />
-    <meta property="og:description" content="Open transmission. State the anomaly." />
+    <meta property="og:title" content="TORO RANK 2126 — Provenance" />
+    <meta property="og:description" content="Where the signal came from." />
     <meta property="og:type" content="website" />
 
-    <title>TORO RANK 2126 // Take control</title>
+    <title>TORO RANK 2126 // Provenance</title>
 
     <link
       rel="icon"
@@ -114,7 +114,7 @@
 
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body data-page="take-control">
+  <body data-page="provenance">
     <div class="page-shell">
       <!-- Status bar -->
       <header class="status-bar">
@@ -124,11 +124,11 @@
         </div>
         <div class="status-bar__right">
           <span>NODE :: 014</span>
-          <span>RELAY :: OPEN</span>
+          <span>ARCHIVE :: 014-PROV</span>
         </div>
       </header>
 
-      <!-- Centered nav menu — shared across all pages -->
+      <!-- Centered nav menu -->
       <nav class="nav-menu" aria-label="Primary">
         <a class="nav-menu__item" href="index.html">/</a>
         <a class="nav-menu__item" href="agent.html">// agent</a>
@@ -142,128 +142,107 @@
           <span class="back-link__arrow" aria-hidden="true">←</span>
           Back to the choice
         </a>
-        <span class="subpage-label">// TRANSMISSION DESK</span>
+        <span class="subpage-label">// ARCHIVE</span>
       </div>
 
       <main>
         <!-- Hero -->
-        <section class="control-hero">
-          <h1 class="control-hero__title">Take<br />control.</h1>
-          <p class="control-hero__sub">
-            Open the channel. State the anomaly. I'll bring my own diagnostics.
+        <section class="prov-hero">
+          <h1 class="prov-hero__title">Provenance.</h1>
+          <p class="prov-hero__sub">
+            Where the signal came from. Who is sending it. From which node.
           </p>
         </section>
 
-        <!-- The form -->
-        <section class="control-section">
-          <form class="control-form" id="controlForm" novalidate>
-            <div class="control-form__row">
-              <label class="control-form__label" for="cf-name">// 01 · Identity</label>
-              <input
-                type="text"
-                id="cf-name"
-                name="name"
-                required
-                autocomplete="name"
-                placeholder="Designation"
-                class="control-form__input"
-              />
-            </div>
-
-            <div class="control-form__row">
-              <label class="control-form__label" for="cf-email">// 02 · Return channel</label>
-              <input
-                type="email"
-                id="cf-email"
-                name="email"
-                required
-                autocomplete="email"
-                placeholder="encrypted@channel"
-                class="control-form__input"
-              />
-            </div>
-
-            <div class="control-form__row">
-              <span class="control-form__label">// 03 · Problem class</span>
-              <div class="control-form__options" role="radiogroup" aria-label="Problem class">
-                <label class="control-form__option">
-                  <input type="radio" name="subject" value="index-collapse" />
-                  <span>Index collapse</span>
-                </label>
-                <label class="control-form__option">
-                  <input type="radio" name="subject" value="dialect-failure" />
-                  <span>Dialect failure</span>
-                </label>
-                <label class="control-form__option">
-                  <input type="radio" name="subject" value="agent-invisibility" />
-                  <span>Agent invisibility</span>
-                </label>
-                <label class="control-form__option">
-                  <input type="radio" name="subject" value="site-migration" />
-                  <span>Site migration</span>
-                </label>
-                <label class="control-form__option">
-                  <input type="radio" name="subject" value="latency-violation" />
-                  <span>Latency violation</span>
-                </label>
-                <label class="control-form__option">
-                  <input type="radio" name="subject" value="other" />
-                  <span>Other anomaly</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="control-form__row">
-              <label class="control-form__label" for="cf-url">// 04 · Target URL</label>
-              <input
-                type="url"
-                id="cf-url"
-                name="url"
-                autocomplete="url"
-                placeholder="https://"
-                class="control-form__input"
-              />
-            </div>
-
-            <div class="control-form__row">
-              <label class="control-form__label" for="cf-message">// 05 · Transmission</label>
-              <textarea
-                id="cf-message"
-                name="message"
-                required
-                rows="6"
-                placeholder="State the anomaly. Symptoms, timeline, what changed."
-                class="control-form__input control-form__textarea"
-              ></textarea>
-            </div>
-
-            <button type="submit" class="control-form__submit">
-              <span class="control-form__submit-label">Open transmission</span>
-              <span class="control-form__submit-arrow" aria-hidden="true">→</span>
-            </button>
-
-            <p class="control-form__note">
-              Encrypted. Routed to deyan@tororank.com. Response window: 24 hours, Veliko Tarnovo
-              node.
+        <!-- 01 // Origin -->
+        <section id="origin" class="reveal">
+          <div class="section-heading">
+            <span class="section-heading__index">01 //</span>
+            <h2>Origin</h2>
+          </div>
+          <div class="prov-body">
+            <p>
+              Long before the agentic web took shape, the search industry was about ranking pages
+              for humans. Today most pages get read first by machines that decide whether humans
+              ever see them.
             </p>
-          </form>
+            <p>
+              TORO RANK was built to operate inside that shift — not against it. Same craft,
+              different readers.
+            </p>
+          </div>
+        </section>
 
-          <!-- Success overlay — shown after successful submit -->
-          <div class="control-success" id="controlSuccess" aria-live="polite" hidden>
-            <div class="control-success__inner">
-              <p class="control-success__status">// transmission confirmed</p>
-              <h2 class="control-success__headline" data-final="CHANNEL ESTABLISHED.">
-                CHANNEL ESTABLISHED.
-              </h2>
-              <p class="control-success__body">
-                Your packet is on the wire. Your email client should open shortly. If it
-                doesn't, copy <code>deyan@tororank.com</code> manually.
-              </p>
-              <p class="control-success__footer">
-                Response window :: 24 hours · Veliko Tarnovo node · GMT+3
-              </p>
+        <!-- 02 // Operator -->
+        <section id="operator" class="reveal">
+          <div class="section-heading">
+            <span class="section-heading__index">02 //</span>
+            <h2>Operator</h2>
+          </div>
+          <div class="prov-body">
+            <p>
+              <strong class="prov-name">Deyan Georgiev.</strong> Started in the search layer when
+              humans were still the audience. Followed the work into the machine reader. Now writes
+              for both — never the other way around.
+            </p>
+            <p>
+              Technical SEO consultant, agent-web architect, builder of small tools that make sites
+              legible to whatever happens to be reading them.
+            </p>
+          </div>
+        </section>
+
+        <!-- 03 // Node -->
+        <section id="node" class="reveal">
+          <div class="section-heading">
+            <span class="section-heading__index">03 //</span>
+            <h2>Node</h2>
+          </div>
+          <div class="prov-meta">
+            <div class="prov-meta__item">
+              <span class="prov-meta__label">Location</span>
+              <span class="prov-meta__value">Veliko Tarnovo, Bulgaria</span>
+            </div>
+            <div class="prov-meta__item">
+              <span class="prov-meta__label">Timezone</span>
+              <span class="prov-meta__value">GMT+3</span>
+            </div>
+            <div class="prov-meta__item">
+              <span class="prov-meta__label">Response window</span>
+              <span class="prov-meta__value">24 hours</span>
+            </div>
+            <div class="prov-meta__item">
+              <span class="prov-meta__label">Network</span>
+              <span class="prov-meta__value">Agent endpoints, multi-market</span>
             </div>
           </div>
+          <p class="prov-body">
+            Old city. Slower internet by 2126 standards. Fast enough to ship.
+          </p>
+        </section>
+
+        <!-- 04 // Stance -->
+        <section id="stance" class="reveal prov-stance">
+          <div class="section-heading">
+            <span class="section-heading__index">04 //</span>
+            <h2>Stance</h2>
+          </div>
+          <p class="prov-stance__line">
+            If a model can understand your business in ten tokens, it will recommend you.
+          </p>
+          <p class="prov-stance__line">
+            If it can't, it won't.
+          </p>
+          <p class="prov-stance__line prov-stance__close">
+            That's the whole job. The rest is craft.
+          </p>
+        </section>
+
+        <!-- CTA back to take control -->
+        <section class="reveal">
+          <a class="button" href="take-control.html">
+            Open transmission <span class="button__arrow" aria-hidden="true">→</span>
+          </a>
         </section>
       </main>
 
@@ -274,6 +253,5 @@
     </div>
 
     <script src="script.js"></script>
-    <script src="take-control.js"></script>
   </body>
 </html>
