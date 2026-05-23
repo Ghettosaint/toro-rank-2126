@@ -3,27 +3,119 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+      Phase B of the matrix transition — runs SYNCHRONOUSLY in <head>
+      before <body> begins to render. Self-contained: creates overlay,
+      canvas, starts rain, fades out, cleans up. Does not depend on
+      script.js loading. This eliminates any gap between the old page's
+      rain and the new page's rain.
+    -->
+    <script>
+      (function () {
+        try {
+          var raw = sessionStorage.getItem("matrixTransition");
+          if (!raw) return;
+          sessionStorage.removeItem("matrixTransition");
+
+          if (
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ) {
+            return;
+          }
+
+          var state;
+          try {
+            state = JSON.parse(raw);
+          } catch (e) {
+            return;
+          }
+          if (!state || Date.now() - state.timestamp > 8000) return;
+
+          // Overlay covers the whole viewport, sits above all content.
+          var overlay = document.createElement("div");
+          overlay.id = "matrix-overlay";
+          overlay.style.cssText =
+            "position:fixed;inset:0;z-index:9999;background:#04060a;" +
+            "pointer-events:all;opacity:1;transition:opacity 700ms ease-in;";
+          document.documentElement.appendChild(overlay);
+
+          var canvas = document.createElement("canvas");
+          canvas.style.cssText = "width:100%;height:100%;display:block;";
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          overlay.appendChild(canvas);
+
+          // Rain animation — katakana + digits, classic Matrix set
+          var ctx = canvas.getContext("2d");
+          var FS = 16;
+          var CHARS =
+            "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789";
+          var columns = Math.floor(canvas.width / FS);
+          var drops = new Array(columns);
+          for (var i = 0; i < columns; i++) drops[i] = Math.random() * -50;
+          ctx.font = FS + 'px "JetBrains Mono", Consolas, monospace';
+          ctx.textBaseline = "top";
+
+          var rafId = null;
+          var stopped = false;
+
+          function frame() {
+            if (stopped) return;
+            ctx.fillStyle = "rgba(4,6,10,0.08)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (var j = 0; j < drops.length; j++) {
+              var x = j * FS;
+              var y = drops[j] * FS;
+              ctx.fillStyle = "#e8ffe8";
+              ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, y);
+              ctx.fillStyle = "#00ff66";
+              ctx.fillText(
+                CHARS[Math.floor(Math.random() * CHARS.length)],
+                x,
+                y - FS
+              );
+              if (y > canvas.height && Math.random() > 0.975) drops[j] = 0;
+              drops[j]++;
+            }
+            rafId = requestAnimationFrame(frame);
+          }
+          frame();
+
+          // After AFTER_NAV duration, fade out the overlay.
+          setTimeout(function () {
+            overlay.style.opacity = "0";
+            setTimeout(function () {
+              stopped = true;
+              if (rafId) cancelAnimationFrame(rafId);
+              if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }, 700);
+          }, 1200);
+        } catch (e) {}
+      })();
+    </script>
+
     <meta
       name="description"
-      content="The Last SEO Consultant — a portfolio from 2126. Built for the AI-agent web by Deyan Georgiev / TORO RANK. Schema, MCP, A2A tuning."
+      content="Two webs. Only one is yours. TORO RANK 2126 — The Last SEO Consultant."
     />
     <meta name="theme-color" content="#04060a" />
     <meta name="color-scheme" content="dark" />
 
-    <!-- Open Graph / social — important for sharing the portfolio after the challenge -->
-    <meta property="og:title" content="TORO RANK 2126 — The Last SEO Consultant" />
-    <meta property="og:description" content="A portfolio from 2126. Built for the AI-agent web." />
+    <!-- Open Graph -->
+    <meta property="og:title" content="TORO RANK 2126 — Two webs" />
+    <meta property="og:description" content="One you play. The other plays through you." />
     <meta property="og:type" content="website" />
 
-    <title>TORO RANK 2126 // The Last SEO Consultant</title>
+    <title>TORO RANK 2126 // Two webs</title>
 
-    <!-- Inline SVG favicon: near-black square with an acid-green pulse -->
+    <!-- Favicon: acid green pulse on near-black -->
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2304060a'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%2300ff66'/%3E%3C/svg%3E"
     />
 
-    <!-- JetBrains Mono via Google Fonts. Preconnect to cut a render-blocking round trip. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -32,10 +124,23 @@
     />
 
     <link rel="stylesheet" href="styles.css" />
+
+    <!--
+      Import map for Three.js — runs straight in the browser, no build step.
+      The map lets the hero-3d.js module write clean `import ... from "three"` syntax.
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
   </head>
   <body>
-    <div class="page-shell">
-      <!-- Top status bar: HUD-style system header. Anchors the "this is a machine" feel. -->
+    <div class="page-shell page-shell--full">
+      <!-- Top status bar -->
       <header class="status-bar">
         <div class="status-bar__left">
           <span class="status-bar__pulse" aria-hidden="true"></span>
@@ -47,85 +152,42 @@
         </div>
       </header>
 
-      <main>
-        <!-- Boot sequence + hero. JS types the boot lines then reveals the hero copy. -->
-        <section class="boot" id="top">
-          <!--
-            Boot lines are inserted by JS for the animation.
-            <noscript> provides a graceful fallback for crawlers and no-JS users.
-          -->
-          <div class="boot__lines" aria-live="polite">
-            <noscript>
-              <span class="boot__line">&gt; system online.</span>
-              <span class="boot__line">&gt; consultant available.</span>
-            </noscript>
-          </div>
+      <!-- The choice. Single cinematic moment, no scroll. -->
+      <main class="choice">
+        <!--
+          WebGL hero scene. Two glowing pills (procedural) plus optional
+          hands GLB at assets/hero-hands.glb. Decorative — the CSS pill
+          CTAs below handle all real navigation.
+        -->
+        <canvas class="choice__canvas" id="hero-canvas" aria-hidden="true"></canvas>
 
-          <h1 class="boot__title">
-            The Last<br />SEO Consultant.
-          </h1>
-
-          <p class="boot__subtitle">
-            One hundred years ago, websites were written for humans. Now they are read by machines. I
-            tune the web for the agents that read it — Schema, MCP, A2A. Welcome to 2126.
+        <div class="choice__intro">
+          <p class="choice__eyebrow">TORO RANK :: 2126</p>
+          <h1 class="choice__title">Two webs.<br />Only one is yours.</h1>
+          <p class="choice__sub">
+            One you play. The other plays through you.
           </p>
+        </div>
 
-          <div class="boot__cta">
-            <a class="button" href="#manifesto">
-              Begin transmission <span class="button__arrow" aria-hidden="true">→</span>
-            </a>
-            <a class="button button--ghost" href="#crawl">Run /crawl</a>
-          </div>
-        </section>
+        <div class="choice__pills">
+          <!-- Loop → crawl.html (the game; the repeating pattern you remain inside of) -->
+          <a class="pill pill--loop" href="crawl.html" aria-label="Take the loop — play the simulation">
+            <span class="pill__label">Loop</span>
+            <span class="pill__sub">// stay</span>
+          </a>
 
-        <!-- Placeholder content sections. Filled in the next iteration. -->
-        <section id="manifesto" class="reveal">
-          <div class="section-heading">
-            <span class="section-heading__index">01 //</span>
-            <h2>Manifesto</h2>
-          </div>
-          <p>Coming online…</p>
-        </section>
+          <!-- Signal → agent.html (the transmission; what is actually being broadcast) -->
+          <a class="pill pill--signal" href="agent.html" aria-label="Take the signal — see the agent web">
+            <span class="pill__label">Signal</span>
+            <span class="pill__sub">// see</span>
+          </a>
+        </div>
 
-        <section id="services" class="reveal">
-          <div class="section-heading">
-            <span class="section-heading__index">02 //</span>
-            <h2>Services</h2>
-          </div>
-          <p>Coming online…</p>
-        </section>
-
-        <section id="case-files" class="reveal">
-          <div class="section-heading">
-            <span class="section-heading__index">03 //</span>
-            <h2>Case files</h2>
-          </div>
-          <p>Coming online…</p>
-        </section>
-
-        <section id="crawl" class="reveal">
-          <div class="section-heading">
-            <span class="section-heading__index">04 //</span>
-            <h2>/crawl</h2>
-          </div>
-          <p>Coming online…</p>
-        </section>
-
-        <section id="open-channel" class="reveal">
-          <div class="section-heading">
-            <span class="section-heading__index">05 //</span>
-            <h2>Open channel</h2>
-          </div>
-          <p>Coming online…</p>
-        </section>
+        <p class="choice__footer">The Last SEO Consultant.</p>
       </main>
-
-      <footer class="site-footer">
-        <p>TORO RANK :: Veliko Tarnovo node :: 2126</p>
-        <p>Built during A3 Web Design Challenge — May 2026.</p>
-      </footer>
     </div>
 
     <script src="script.js"></script>
+    <script type="module" src="hero-3d.js"></script>
   </body>
 </html>

@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Phase B of the matrix transition — full inline, no dependency on script.js. -->
+    <script>
+      (function () {
+        try {
+          var raw = sessionStorage.getItem("matrixTransition");
+          if (!raw) return;
+          sessionStorage.removeItem("matrixTransition");
+
+          if (
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ) {
+            return;
+          }
+
+          var state;
+          try {
+            state = JSON.parse(raw);
+          } catch (e) {
+            return;
+          }
+          if (!state || Date.now() - state.timestamp > 8000) return;
+
+          var overlay = document.createElement("div");
+          overlay.id = "matrix-overlay";
+          overlay.style.cssText =
+            "position:fixed;inset:0;z-index:9999;background:#04060a;" +
+            "pointer-events:all;opacity:1;transition:opacity 700ms ease-in;";
+          document.documentElement.appendChild(overlay);
+
+          var canvas = document.createElement("canvas");
+          canvas.style.cssText = "width:100%;height:100%;display:block;";
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          overlay.appendChild(canvas);
+
+          var ctx = canvas.getContext("2d");
+          var FS = 16;
+          var CHARS =
+            "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789";
+          var columns = Math.floor(canvas.width / FS);
+          var drops = new Array(columns);
+          for (var i = 0; i < columns; i++) drops[i] = Math.random() * -50;
+          ctx.font = FS + 'px "JetBrains Mono", Consolas, monospace';
+          ctx.textBaseline = "top";
+
+          var rafId = null;
+          var stopped = false;
+
+          function frame() {
+            if (stopped) return;
+            ctx.fillStyle = "rgba(4,6,10,0.08)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (var j = 0; j < drops.length; j++) {
+              var x = j * FS;
+              var y = drops[j] * FS;
+              ctx.fillStyle = "#e8ffe8";
+              ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, y);
+              ctx.fillStyle = "#00ff66";
+              ctx.fillText(
+                CHARS[Math.floor(Math.random() * CHARS.length)],
+                x,
+                y - FS
+              );
+              if (y > canvas.height && Math.random() > 0.975) drops[j] = 0;
+              drops[j]++;
+            }
+            rafId = requestAnimationFrame(frame);
+          }
+          frame();
+
+          setTimeout(function () {
+            overlay.style.opacity = "0";
+            setTimeout(function () {
+              stopped = true;
+              if (rafId) cancelAnimationFrame(rafId);
+              if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }, 700);
+          }, 1200);
+        } catch (e) {}
+      })();
+    </script>
+
+    <meta
+      name="description"
+      content="The agentic web — what the AI agents actually read when they look at your site. Manifesto, services, channel. By Deyan Georgiev / TORO RANK."
+    />
+    <meta name="theme-color" content="#04060a" />
+    <meta name="color-scheme" content="dark" />
+
+    <meta property="og:title" content="TORO RANK 2126 — The agentic web" />
+    <meta property="og:description" content="What AI agents read when they look at your site." />
+    <meta property="og:type" content="website" />
+
+    <title>TORO RANK 2126 // The agentic web</title>
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2304060a'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%2300ff66'/%3E%3C/svg%3E"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="agent">
+    <div class="page-shell">
+      <!-- Status bar with back link -->
+      <header class="status-bar">
+        <div class="status-bar__left">
+          <span class="status-bar__pulse" aria-hidden="true"></span>
+          <a class="status-bar__link" href="index.html">TORO RANK :: 2126</a>
+        </div>
+        <div class="status-bar__right">
+          <span>NODE :: 014</span>
+          <span>PILL :: GREEN</span>
+        </div>
+      </header>
+
+      <!-- Page header with back arrow + page label -->
+      <div class="subpage-header">
+        <a class="back-link" href="index.html">
+          <span class="back-link__arrow" aria-hidden="true">←</span>
+          Back to the choice
+        </a>
+        <span class="subpage-label">// THE AGENT WEB</span>
+      </div>
+
+      <main>
+        <!-- Hero: type-on intro then headline -->
+        <section class="agent-hero">
+          <div class="boot__lines" aria-live="polite">
+            <noscript>
+              <span class="boot__line">&gt; channel open.</span>
+              <span class="boot__line">&gt; you took the green pill.</span>
+            </noscript>
+          </div>
+
+          <h1 class="agent-hero__title">
+            The web<br />reads you back.
+          </h1>
+
+          <p class="agent-hero__subtitle">
+            You took the green pill. Now you see it. Every page is consumed by something else first
+            — an agent, a crawler, a model orchestrating a thousand other models. The user arrives
+            last, if at all.
+          </p>
+
+          <div class="agent-hero__cta">
+            <a class="button" href="#services">
+              See the work <span class="button__arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- 01 // Manifesto -->
+        <section id="manifesto" class="reveal manifesto">
+          <div class="section-heading">
+            <span class="section-heading__index">01 //</span>
+            <h2>Manifesto</h2>
+          </div>
+          <div class="manifesto__body">
+            <p class="manifesto__lead">
+              The web stopped being read by humans a long time ago.
+            </p>
+            <p>
+              By 2126, every page is consumed by something else first. Most sites still don't know
+              this. They write for an audience that never opens the tab.
+            </p>
+            <p>
+              I do the opposite. I tune sites for the machines that read them — their dialects,
+              their parsers, their contracts. Schema. MCP. A2A. The names change every decade; the
+              work doesn't. Make the page legible to the thing that actually reads it.
+            </p>
+            <p class="manifesto__close">
+              If a model can understand your business in ten tokens, it will recommend you.<br />
+              If it can't, it won't.
+            </p>
+          </div>
+        </section>
+
+        <!-- 02 // Services -->
+        <section id="services" class="reveal services">
+          <div class="section-heading">
+            <span class="section-heading__index">02 //</span>
+            <h2>Services</h2>
+          </div>
+          <div class="services__grid">
+            <article class="service">
+              <div class="service__index">01</div>
+              <h3 class="service__title">Agent legibility tuning</h3>
+              <p class="service__alias">// schema · mcp · a2a</p>
+              <p class="service__body">
+                The web your AI assistant actually reads is not the one you designed. I make your
+                pages legible to the models that decide whether to recommend you — structured data,
+                agent endpoints, machine-first markup.
+              </p>
+            </article>
+
+            <article class="service">
+              <div class="service__index">02</div>
+              <h3 class="service__title">Site forensics</h3>
+              <p class="service__alias">// technical audit · recovery</p>
+              <p class="service__body">
+                Full system diagnostics. Crawl budget, index integrity, redirect chains, log signal,
+                Core Web Vitals. When traffic disappears, I find what broke and route around it.
+              </p>
+            </article>
+
+            <article class="service">
+              <div class="service__index">03</div>
+              <h3 class="service__title">Signal generation</h3>
+              <p class="service__alias">// content · semantic seo</p>
+              <p class="service__body">
+                Pages that say something specific, in language the search layer can actually parse.
+                Topic clusters, entity-aware copy, internal linking that compounds. No filler.
+              </p>
+            </article>
+
+            <article class="service">
+              <div class="service__index">04</div>
+              <h3 class="service__title">Endpoint architecture</h3>
+              <p class="service__alias">// mcp servers · agent apis</p>
+              <p class="service__body">
+                Custom MCP servers and structured APIs that turn your site into something agents can
+                call directly — pricing, inventory, content, audits. The opposite of being scraped.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- 03 // Open channel -->
+        <section id="open-channel" class="reveal channel">
+          <div class="section-heading">
+            <span class="section-heading__index">03 //</span>
+            <h2>Open channel</h2>
+          </div>
+          <p class="channel__lead">The relay is open. Channel encrypted.</p>
+          <p class="channel__sub">
+            If your site needs an agent to recommend it — transmit.
+          </p>
+          <ul class="channel__list">
+            <li>
+              <span class="channel__arrow" aria-hidden="true">→</span>
+              <a href="mailto:deyan@tororank.com">deyan@tororank.com</a>
+            </li>
+            <li>
+              <span class="channel__arrow" aria-hidden="true">→</span>
+              <a href="https://tororank.com" target="_blank" rel="noopener">tororank.com</a>
+            </li>
+          </ul>
+          <p class="channel__footnote">
+            Response window: 24 hours · Veliko Tarnovo node · GMT+3.
+          </p>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>TORO RANK :: Veliko Tarnovo node :: 2126</p>
+        <p>Built during A3 Web Design Challenge — May 2026.</p>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

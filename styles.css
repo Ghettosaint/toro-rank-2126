@@ -2,9 +2,13 @@
  * TORO RANK 2126 — The Last SEO Consultant
  * Design system for the A3 Web Design Challenge.
  *
- * Single dominant color: acid green on near-black.
- * Aesthetic: 2126 terminal HUD — modern motion, AI-agent metaphors,
- * NOT 1999 Matrix nostalgia. Built for One Color + Portfolio + Web Game.
+ * Concept: Morpheus' choice. Landing presents two pills.
+ *   Blue → /crawl  (the game, the simulation)
+ *   Red  → /agent  (the agentic web — reality)
+ *
+ * Color: acid green dominant on near-black, blue used only as
+ * the secondary "pill" accent. Stripped CRT/scan-line treatment
+ * that was reading as 1999 instead of 2126.
  */
 
 /* -------------------------------------------------------------
@@ -13,17 +17,20 @@
 :root {
   color-scheme: dark;
 
-  /* Background layers */
-  --bg: #04060a;                 /* near-black canvas */
-  --surface: #07100c;            /* elevated panel */
-  --surface-strong: #0a1810;     /* deeper panel */
+  /* Background */
+  --bg: #04060a;
+  --surface: #07100c;
+  --surface-strong: #0a1810;
 
-  /* Acid green ramp (the entire palette is just this color) */
-  --green-100: #e8ffe8;          /* near-white green, max emphasis */
-  --green-300: #6dff8e;          /* light accent */
-  --green-500: #00ff66;          /* PRIMARY — Matrix acid green */
-  --green-700: #00cc52;          /* muted accent */
-  --green-900: #1a4a2a;          /* dim, for backgrounds & borders */
+  /* Acid green — the one color */
+  --green-100: #e8ffe8;
+  --green-300: #6dff8e;
+  --green-500: #00ff66;
+  --green-700: #00cc52;
+  --green-900: #1a4a2a;
+
+  /* Secondary — only the blue pill */
+  --blue-glow: #4ab8ff;
 
   /* Text */
   --text: var(--green-500);
@@ -35,14 +42,10 @@
   --border: #1a3a22;
   --border-strong: #2a5a3a;
 
-  /* Used sparingly only for in-game traps and warnings */
-  --danger: #ff3055;
-  --warning: #ffd400;
-
-  /* Glow */
-  --glow-sm: 0 0 6px rgba(0, 255, 102, 0.6);
-  --glow-md: 0 0 14px rgba(0, 255, 102, 0.5);
-  --glow-lg: 0 0 32px rgba(0, 255, 102, 0.4);
+  /* Glow — toned down. Use only where the moment matters. */
+  --glow-sm: 0 0 4px rgba(0, 255, 102, 0.4);
+  --glow-md: 0 0 10px rgba(0, 255, 102, 0.4);
+  --glow-lg: 0 0 32px rgba(0, 255, 102, 0.35);
 
   /* Motion */
   --ease-out: cubic-bezier(0.2, 0, 0.2, 1);
@@ -82,37 +85,9 @@ body {
   letter-spacing: 0;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-
-  /* The whole page is "a screen" — relative positioning anchors the overlays */
-  position: relative;
-  overflow-x: hidden;
 }
 
-/* Scan-line overlay — subtle horizontal lines. Fixed so it stays on every section. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 100;
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0) 0px,
-    rgba(0, 0, 0, 0) 2px,
-    rgba(0, 0, 0, 0.07) 3px,
-    rgba(0, 0, 0, 0) 4px
-  );
-}
-
-/* CRT vignette — corners darken slightly */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 99;
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
-}
+/* No more scan lines, no more vignette. The screen is the screen. */
 
 /* -------------------------------------------------------------
  * Typography
@@ -124,25 +99,22 @@ h4 {
   font-family: var(--font-mono);
   font-weight: 700;
   margin: 0;
-  letter-spacing: -0.02em;
-  text-shadow: var(--glow-sm);
+  letter-spacing: -0.03em;
 }
 
 h1 {
-  font-size: clamp(2.4rem, 7vw, 4.6rem);
-  line-height: 1;
+  font-size: clamp(2.6rem, 9vw, 6.5rem);
+  line-height: 0.96;
   color: var(--text-bright);
-  text-shadow: var(--glow-md);
 }
 
 h2 {
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  line-height: 1.1;
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  line-height: 1.05;
 }
 
 h3 {
   font-size: 1.05rem;
-  letter-spacing: 0;
 }
 
 p {
@@ -182,13 +154,18 @@ code,
   width: min(calc(100% - 2rem), var(--content-width));
   margin: 0 auto;
   padding: 1.5rem 0 4rem;
-  position: relative;
-  z-index: 1; /* above the vignette/scan overlays */
+}
+
+/* Full-viewport variant for the landing — no scroll, cinematic. */
+.page-shell--full {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1.5rem;
 }
 
 /* -------------------------------------------------------------
- * Status bar (top HUD)
- * Looks like a system header — anchors the "this is a machine" feel.
+ * Status bar (top HUD) — shared across pages
  * ------------------------------------------------------------- */
 .status-bar {
   display: flex;
@@ -200,7 +177,6 @@ code,
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: 3rem;
 }
 
 .status-bar__left,
@@ -219,6 +195,17 @@ code,
   animation: pulse 1.4s ease-in-out infinite;
 }
 
+.status-bar__link {
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.status-bar__link:hover {
+  color: var(--green-500);
+  text-decoration: none;
+}
+
 @keyframes pulse {
   0%,
   100% {
@@ -232,19 +219,239 @@ code,
 }
 
 /* -------------------------------------------------------------
- * Boot sequence + hero
+ * Landing — the choice
+ *
+ * Centered cinematic moment. Works without the hands image
+ * (typography + pill CTAs carry the page). Image lays behind
+ * the type when present.
  * ------------------------------------------------------------- */
-.boot {
-  min-height: 70vh;
+.choice {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  text-align: center;
   padding: 4rem 0;
+  position: relative;
 }
 
+/*
+ * Hero 3D canvas — fills the choice area as cinematic backdrop.
+ * Now interactive: pointer-events: auto so OrbitControls can capture
+ * drag-to-rotate. Text overlays above it use pointer-events: none so
+ * the canvas underneath still receives drags; pill CTAs explicitly
+ * re-enable pointer-events so they remain clickable.
+ */
+.choice__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: auto;
+  cursor: grab;
+  animation: fadeIn 1.4s var(--ease-out) both;
+}
+
+.choice__canvas:active {
+  cursor: grabbing;
+}
+
+/*
+ * Text overlays above the canvas — don't block drag events.
+ * The CSS pills inside .choice__pills re-enable pointer-events
+ * via their own .pill rule below.
+ */
+.choice__intro,
+.choice__sub,
+.choice__footer {
+  pointer-events: none;
+}
+
+.choice__pills {
+  pointer-events: none; /* container is just layout */
+}
+
+.pill {
+  pointer-events: auto; /* actual click targets */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.choice__intro,
+.choice__pills,
+.choice__footer {
+  position: relative;
+  z-index: 1;
+}
+
+.choice__eyebrow {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.choice__title {
+  margin-bottom: 1rem;
+}
+
+.choice__sub {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-bottom: 4rem;
+  max-width: 40ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.choice__pills {
+  display: flex;
+  gap: 3rem;
+  margin-bottom: 4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.choice__footer {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: auto;
+}
+
+/* -------------------------------------------------------------
+ * Pill CTA — the two giant choices on the landing
+ * ------------------------------------------------------------- */
+.pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 2.5rem;
+  border: 1px solid var(--border-strong);
+  background: rgba(4, 6, 10, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  text-decoration: none;
+  color: var(--text-bright);
+  min-width: 220px;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    border-color var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+.pill:hover {
+  transform: translateY(-4px);
+  text-decoration: none;
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--green-500);
+  outline-offset: 4px;
+}
+
+.pill__label {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.pill__sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/*
+ * Both pills live in the same green family — the 3D model shows
+ * two near-identical pills, so the CTAs no longer reference color.
+ * Hierarchy comes from intensity: Loop is muted, Signal is sharp.
+ */
+
+/* Loop — the simulation / the game (dimmer, cooler — "stuck" feel) */
+.pill--loop:hover {
+  border-color: var(--green-700);
+  box-shadow: 0 0 18px rgba(0, 204, 82, 0.3);
+}
+
+.pill--loop:hover .pill__label {
+  color: var(--green-300);
+}
+
+/* Signal — the agent web / reality (brighter, sharper — "awake" feel) */
+.pill--signal:hover {
+  border-color: var(--green-500);
+  box-shadow: var(--glow-lg);
+}
+
+.pill--signal:hover .pill__label {
+  color: var(--green-500);
+}
+
+/* -------------------------------------------------------------
+ * Subpages — agent.html and crawl.html share this wrapper
+ * ------------------------------------------------------------- */
+.subpage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2.5rem 0 4rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.88rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.back-link:hover {
+  color: var(--green-500);
+  text-decoration: none;
+}
+
+.back-link__arrow {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.back-link:hover .back-link__arrow {
+  transform: translateX(-3px);
+}
+
+.subpage-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* -------------------------------------------------------------
+ * Boot lines (used on agent.html — terminal type-on intro)
+ * ------------------------------------------------------------- */
 .boot__lines {
-  margin-bottom: 1.2rem;
-  min-height: 5rem; /* prevents layout shift while lines type in */
+  margin-bottom: 1.5rem;
+  min-height: 4rem;
 }
 
 .boot__line {
@@ -255,7 +462,6 @@ code,
   white-space: pre;
 }
 
-/* Blinking cursor at the end of the currently-typing line */
 .boot__line--current::after {
   content: "_";
   display: inline-block;
@@ -270,10 +476,10 @@ code,
   }
 }
 
-/* Hero copy hidden until boot sequence completes — JS toggles the --ready classes */
-.boot__title,
-.boot__subtitle,
-.boot__cta {
+/* Hero copy on agent.html — fades in after boot lines */
+.agent-hero__title,
+.agent-hero__subtitle,
+.agent-hero__cta {
   opacity: 0;
   transform: translateY(8px);
   transition:
@@ -281,31 +487,34 @@ code,
     transform var(--dur-slow) var(--ease-out);
 }
 
-.boot__subtitle {
+.agent-hero__subtitle {
   transition-delay: 180ms;
+}
+
+.agent-hero__cta {
+  transition-delay: 360ms;
+}
+
+.agent-hero__title--ready,
+.agent-hero__subtitle--ready,
+.agent-hero__cta--ready {
+  opacity: 1;
+  transform: none;
+}
+
+.agent-hero__title {
+  margin-bottom: 1.5rem;
+}
+
+.agent-hero__subtitle {
   margin-top: 1.2rem;
   color: var(--text-muted);
   font-size: 1.05rem;
   max-width: 64ch;
 }
 
-.boot__cta {
-  transition-delay: 360ms;
-  margin-top: 2.5rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.boot__title--ready,
-.boot__subtitle--ready,
-.boot__cta--ready {
-  opacity: 1;
-  transform: none;
-}
-
 /* -------------------------------------------------------------
- * Buttons
+ * Buttons (used throughout subpages)
  * ------------------------------------------------------------- */
 .button {
   display: inline-flex;
@@ -364,18 +573,18 @@ code,
 }
 
 /* -------------------------------------------------------------
- * Section heading
+ * Sections (used on agent.html)
  * ------------------------------------------------------------- */
 section {
-  margin-bottom: 5rem;
-  scroll-margin-top: 2rem; /* anchor links don't hide under the status bar */
+  margin-bottom: 6rem;
+  scroll-margin-top: 2rem;
 }
 
 .section-heading {
   display: flex;
   align-items: baseline;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border);
 }
@@ -388,8 +597,165 @@ section {
 }
 
 /* -------------------------------------------------------------
+ * Manifesto
+ * ------------------------------------------------------------- */
+.manifesto__body {
+  max-width: 64ch;
+}
+
+.manifesto__lead {
+  font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+  color: var(--text-bright);
+  margin-bottom: 1.5rem;
+  line-height: 1.3;
+  max-width: 100%;
+}
+
+.manifesto__close {
+  margin-top: 2rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--green-500);
+  color: var(--text-bright);
+  line-height: 1.5;
+}
+
+/* -------------------------------------------------------------
+ * Services
+ * ------------------------------------------------------------- */
+.services__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.service {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.8rem 1.6rem;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.service:hover {
+  border-color: var(--green-500);
+  box-shadow: var(--glow-sm);
+}
+
+.service__index {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+}
+
+.service__title {
+  font-size: 1.15rem;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+}
+
+.service__alias {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+}
+
+.service__body {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* -------------------------------------------------------------
+ * Open channel
+ * ------------------------------------------------------------- */
+.channel__lead {
+  font-size: 1.2rem;
+  color: var(--text-bright);
+  margin-bottom: 0.3rem;
+}
+
+.channel__sub {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.channel__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.channel__list li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 1.05rem;
+}
+
+.channel__arrow {
+  color: var(--green-500);
+  font-weight: 700;
+}
+
+.channel__footnote {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+/* -------------------------------------------------------------
+ * Crawl game stage — wraps the canvas
+ * ------------------------------------------------------------- */
+.crawl-stage {
+  border: 1px solid var(--border-strong);
+  background: #04060a;
+  overflow: hidden;
+  position: relative;
+  /* Sized to give the game a cinematic widescreen feel */
+  height: clamp(380px, 60vh, 620px);
+  box-shadow: 0 0 32px rgba(0, 255, 102, 0.05);
+}
+
+#crawl-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: pointer;
+  outline: none;
+}
+
+#crawl-canvas:focus-visible {
+  outline: 2px solid var(--green-500);
+  outline-offset: -2px;
+}
+
+.crawl-hint {
+  margin: 1.2rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.crawl-hint .mono {
+  color: var(--green-300);
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--border-strong);
+  margin: 0 0.15rem;
+  font-size: 0.8rem;
+}
+
+/* -------------------------------------------------------------
  * Reveal on scroll
- * Kept from the A3 starter — accessibility-friendly pattern.
  * ------------------------------------------------------------- */
 .reveal {
   opacity: 1;
@@ -437,10 +803,6 @@ section {
     font-size: 14px;
   }
 
-  .page-shell {
-    padding-top: 1rem;
-  }
-
   .status-bar {
     flex-direction: column;
     gap: 0.5rem;
@@ -452,17 +814,18 @@ section {
     gap: 1rem;
   }
 
-  .boot {
-    min-height: 60vh;
+  .choice {
+    padding: 2rem 0;
   }
 
-  .boot__cta {
+  .choice__pills {
     flex-direction: column;
-    align-items: stretch;
+    gap: 1.5rem;
+    width: 100%;
   }
 
-  .button {
-    justify-content: center;
+  .pill {
+    width: 100%;
   }
 
   .site-footer {
@@ -471,7 +834,7 @@ section {
 }
 
 /* -------------------------------------------------------------
- * Reduced motion — respect the user's OS setting
+ * Reduced motion
  * ------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -492,15 +855,14 @@ section {
     transform: none;
   }
 
-  .boot__title,
-  .boot__subtitle,
-  .boot__cta {
+  .agent-hero__title,
+  .agent-hero__subtitle,
+  .agent-hero__cta {
     opacity: 1;
     transform: none;
   }
 
-  /* Scan lines flicker can trigger sensitivity — drop them under reduced-motion */
-  body::before {
-    display: none;
+  .choice__image {
+    opacity: 0.55;
   }
 }
