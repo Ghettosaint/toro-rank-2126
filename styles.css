@@ -1561,6 +1561,8 @@ section {
     #010c05;
   overflow: hidden;
   box-shadow: inset 0 0 48px rgba(0, 255, 102, 0.08), var(--glow-lg);
+  cursor: crosshair;
+  touch-action: none;
 }
 
 .signal-radar canvas {
@@ -1584,6 +1586,50 @@ section {
   background: rgba(1, 12, 5, 0.76);
   box-shadow: var(--glow-md);
   font-weight: 700;
+  pointer-events: none;
+}
+
+.signal-radar__tooltip {
+  position: absolute;
+  z-index: 3;
+  width: min(230px, calc(100% - 2rem));
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--green-500);
+  background: rgba(1, 12, 5, 0.94);
+  color: var(--green-100);
+  box-shadow: 0 0 24px rgba(0, 255, 102, 0.22);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, calc(-100% - 14px));
+  transition: opacity 140ms var(--ease-out);
+}
+
+.signal-radar__tooltip.is-visible {
+  opacity: 1;
+}
+
+.signal-radar__tooltip strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--green-100);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: var(--glow-sm);
+}
+
+.signal-radar__tooltip span {
+  display: block;
+  color: var(--green-300);
+  font-size: 0.72rem;
+  margin-bottom: 0.25rem;
+}
+
+.signal-radar__tooltip p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.35;
 }
 
 .signal-grid {
