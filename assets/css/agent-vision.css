@@ -575,6 +575,30 @@ body.agent-vision-active .agent-vision-path {
 }
 
 /* -------------------------------------------------------------
+ * Noise layer — un-captured text in <main> is scrambled to look
+ * like background code. Class added by JS to each text node's
+ * parent. !important overrides existing styles cleanly.
+ * ------------------------------------------------------------- */
+.av-noise {
+  color: rgba(0, 255, 102, 0.32) !important;
+  text-shadow: none !important;
+  font-family: "JetBrains Mono", Consolas, monospace !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.04em !important;
+  transition: color 0.3s ease-out;
+}
+
+/* When a target gets captured/active, drop the noise look on its
+   own subtree so it pops as "decoded" against the noise. */
+.av-target-active.av-noise,
+.av-target-active .av-noise,
+.av-target-captured.av-noise,
+.av-target-captured .av-noise {
+  color: var(--text-bright, #e8ffe8) !important;
+  text-shadow: 0 0 8px rgba(0, 255, 102, 0.55) !important;
+}
+
+/* -------------------------------------------------------------
  * Reduced motion — kill the line reveal stagger
  * ------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {

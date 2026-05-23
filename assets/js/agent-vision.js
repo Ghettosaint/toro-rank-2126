@@ -395,6 +395,92 @@
   }
 
   // -----------------------------------------------------------
+  // Noise layer — scramble text in <main> when AV is active.
+  //
+  // On activate: every text node inside <main> (except UI chrome
+  // like the toggle, terminal, signal trial) is replaced with
+  // random katakana/digits. The original is cached on the node
+  // itself via a non-standard property so we can restore later.
+  //
+  // When the traveler reaches an endpoint, the target subtree is
+  // restored — only the traversed endpoints become readable.
+  // -----------------------------------------------------------
+  const NOISE_POOL =
+    "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメ0123456789@#${}<>";
+
+  const NOISE_SKIP_SELECTORS = [
+    ".agent-vision-toggle",
+    ".agent-vision-terminal",
+    ".agent-vision-endpoint",
+    ".agent-vision-traveler",
+    ".agent-vision-rain",
+    ".agent-vision-flash",
+    ".signal-trial",
+    ".signal-trial-trigger",
+  ];
+
+  function shouldSkipNoise(node) {
+    const parent = node.parentElement;
+    if (!parent) return true;
+    for (let i = 0; i < NOISE_SKIP_SELECTORS.length; i++) {
+      if (parent.closest(NOISE_SKIP_SELECTORS[i])) return true;
+    }
+    return false;
+  }
+
+  function scrambleNode(node) {
+    if (!node.__avOriginal) {
+      node.__avOriginal = node.nodeValue;
+    }
+    node.nodeValue = node.__avOriginal
+      .split("")
+      .map(function (c) {
+        if (c === " " || c === "\n" || c === "\t") return c;
+        return NOISE_POOL[Math.floor(Math.random() * NOISE_POOL.length)];
+      })
+      .join("");
+    if (node.parentElement) {
+      node.parentElement.classList.add("av-noise");
+    }
+  }
+
+  function restoreNode(node) {
+    if (node.__avOriginal !== undefined) {
+      node.nodeValue = node.__avOriginal;
+      if (node.parentElement) {
+        node.parentElement.classList.remove("av-noise");
+      }
+    }
+  }
+
+  function walkTextNodes(root, callback) {
+    if (!root) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    while (walker.nextNode()) callback(walker.currentNode);
+  }
+
+  function applyNoise() {
+    const main = document.querySelector("main");
+    if (!main) return;
+    walkTextNodes(main, function (node) {
+      if (!node.nodeValue || !node.nodeValue.trim()) return;
+      if (shouldSkipNoise(node)) return;
+      scrambleNode(node);
+    });
+  }
+
+  function revealSubtree(el) {
+    if (!el) return;
+    walkTextNodes(el, restoreNode);
+  }
+
+  function restoreAllNoise() {
+    const main = document.querySelector("main");
+    if (!main) return;
+    walkTextNodes(main, restoreNode);
+  }
+
+  // -----------------------------------------------------------
   // Endpoint traversal
   //
   // Builds DOM markers for each page-specific endpoint and
@@ -551,6 +637,8 @@
         marker.el.classList.add("is-active");
         if (marker.target) {
           marker.target.classList.add("av-target-active");
+          // Restore real text on the scanned target (and descendants)
+          revealSubtree(marker.target);
         }
         // Move traveler
         if (traveler) {
@@ -650,11 +738,15 @@
       // settles + boot flash gets a moment to play first.
       window.setTimeout(function () {
         buildEndpoints();
+        // Apply noise scramble to all main content BEFORE traversal
+        // starts. Endpoints get revealed as the traveler visits.
+        applyNoise();
         startTraversal();
       }, userTriggered ? 600 : 250);
     } else {
       stopRain();
       clearEndpoints();
+      restoreAllNoise();
     }
   }
 

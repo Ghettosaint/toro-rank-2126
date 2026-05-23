@@ -1,0 +1,371 @@
+/*
+ * SIGNAL TRIAL — cinematic "agent judgment" scene
+ *
+ * Take-control page only. Triggered by REQUEST AGENT JUDGMENT button.
+ * Overlay → scanning sequence → meters fill → final verdict → CTA.
+ * Existing form submit still drives the actual mailto: transmission.
+ */
+
+/* -------------------------------------------------------------
+ * Trigger button — injected by JS into .control-section.
+ * Sits above the form, visually distinct from the Sign packet CTA.
+ * ------------------------------------------------------------- */
+.signal-trial-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 2rem;
+  padding: 1rem 1.8rem;
+  background: transparent;
+  border: 1.5px solid #00ff66;
+  color: #00ff66;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition:
+    background 0.2s ease-out,
+    color 0.2s ease-out,
+    box-shadow 0.2s ease-out,
+    transform 0.2s ease-out;
+}
+
+.signal-trial-trigger::before,
+.signal-trial-trigger::after {
+  content: "[";
+  font-weight: 400;
+  color: rgba(0, 255, 102, 0.7);
+}
+.signal-trial-trigger::after {
+  content: "]";
+}
+
+.signal-trial-trigger:hover {
+  background: #00ff66;
+  color: #010c05;
+  box-shadow: 0 0 24px rgba(0, 255, 102, 0.5);
+  transform: translateY(-2px);
+}
+
+.signal-trial-trigger:hover::before,
+.signal-trial-trigger:hover::after {
+  color: #010c05;
+}
+
+.signal-trial-trigger:focus-visible {
+  outline: 2px solid #e8ffe8;
+  outline-offset: 3px;
+}
+
+/* -------------------------------------------------------------
+ * Overlay — full viewport dark blur, centered chamber
+ * ------------------------------------------------------------- */
+.signal-trial {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(1, 12, 5, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
+}
+
+body.signal-trial-active .signal-trial {
+  display: flex;
+  opacity: 1;
+}
+
+/* Subtle scanline overlay on the trial backdrop */
+.signal-trial::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 3px,
+    rgba(0, 255, 102, 0.06) 3px,
+    rgba(0, 255, 102, 0.06) 4px
+  );
+}
+
+/* Chamber — bordered card with corner brackets */
+.signal-trial__chamber {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(2, 18, 8, 0.92);
+  border: 1px solid #00ff66;
+  padding: 2.2rem 2rem;
+  box-shadow: 0 0 60px rgba(0, 255, 102, 0.25);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  color: #e8ffe8;
+}
+
+.signal-trial__chamber::before,
+.signal-trial__chamber::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid #00ff66;
+  box-shadow: 0 0 6px rgba(0, 255, 102, 0.55);
+  pointer-events: none;
+}
+.signal-trial__chamber::before {
+  top: -2px; left: -2px;
+  border-right: none; border-bottom: none;
+}
+.signal-trial__chamber::after {
+  bottom: -2px; right: -2px;
+  border-left: none; border-top: none;
+}
+
+/* Chamber head — title + close */
+.signal-trial__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(0, 255, 102, 0.4);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #6dff8e;
+}
+
+.signal-trial__close {
+  background: transparent;
+  border: 1px solid rgba(0, 255, 102, 0.5);
+  color: #6dff8e;
+  font-family: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+}
+
+.signal-trial__close:hover,
+.signal-trial__close:focus-visible {
+  border-color: #00ff66;
+  color: #00ff66;
+}
+
+.signal-trial__close:focus-visible {
+  outline: 2px solid #00ff66;
+  outline-offset: 2px;
+}
+
+/* Scan lines list */
+.signal-trial__lines {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  font-size: 0.86rem;
+  color: #00ff66;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-height: 9rem;
+}
+
+.signal-trial__lines li {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.35s ease-out, transform 0.35s ease-out;
+}
+
+.signal-trial__lines li.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Meters — 5 horizontal bars with labels + percentage */
+.signal-trial__meters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 1.5rem;
+}
+
+.signal-trial__meter {
+  display: grid;
+  grid-template-columns: 110px 1fr 44px;
+  gap: 0.7rem;
+  align-items: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #6dff8e;
+}
+
+.signal-trial__meter-track {
+  height: 8px;
+  background: rgba(0, 255, 102, 0.1);
+  border: 1px solid rgba(0, 255, 102, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.signal-trial__meter-fill {
+  position: absolute;
+  inset: 0;
+  width: 0;
+  background: linear-gradient(90deg, #00cc52, #00ff66, #e8ffe8);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.7);
+  transition: width 1.4s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.signal-trial__meter.is-filling .signal-trial__meter-fill {
+  width: var(--fill, 80%);
+}
+
+.signal-trial__meter-value {
+  font-variant-numeric: tabular-nums;
+  color: #00ff66;
+  text-align: right;
+}
+
+/* Verdict — large headline with glitch flash */
+.signal-trial__verdict {
+  text-align: center;
+  margin: 1.5rem 0 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 255, 102, 0.4);
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+.signal-trial__verdict.is-visible {
+  opacity: 1;
+}
+
+.signal-trial__verdict-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #6dff8e;
+  margin-bottom: 0.6rem;
+}
+
+.signal-trial__verdict-text {
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #e8ffe8;
+  text-shadow: 0 0 12px rgba(0, 255, 102, 0.6);
+  margin: 0;
+}
+
+.signal-trial__verdict.is-glitching .signal-trial__verdict-text {
+  animation: stVerdictGlitch 0.6s steps(8) 1;
+}
+
+@keyframes stVerdictGlitch {
+  0%, 100% { transform: translate(0, 0); text-shadow: 0 0 12px rgba(0, 255, 102, 0.6); }
+  20% { transform: translate(2px, -1px); text-shadow: -2px 0 #ff3055, 2px 0 #4ab8ff, 0 0 12px rgba(0, 255, 102, 0.6); }
+  40% { transform: translate(-2px, 1px); text-shadow: 2px 0 #ff3055, -2px 0 #4ab8ff, 0 0 12px rgba(0, 255, 102, 0.6); }
+  60% { transform: translate(1px, -2px); text-shadow: -1px 0 #ff3055, 1px 0 #4ab8ff, 0 0 12px rgba(0, 255, 102, 0.6); }
+  80% { transform: translate(-1px, 1px); text-shadow: 0 0 12px rgba(0, 255, 102, 0.85); }
+}
+
+/* CTA — final OPEN TRANSMISSION button */
+.signal-trial__cta {
+  display: none;
+  width: 100%;
+  padding: 1.05rem 1.5rem;
+  background: #00ff66;
+  color: #010c05;
+  border: none;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.signal-trial__cta.is-ready {
+  display: block;
+  animation: stCtaIn 0.4s ease-out forwards;
+}
+
+@keyframes stCtaIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.signal-trial__cta:hover {
+  background: #6dff8e;
+  box-shadow: 0 0 32px rgba(0, 255, 102, 0.7);
+  transform: translateY(-2px);
+}
+
+.signal-trial__cta:focus-visible {
+  outline: 2px solid #e8ffe8;
+  outline-offset: 3px;
+}
+
+/* When Agent Vision is also active — slightly more intense */
+body.agent-vision-active .signal-trial {
+  background: rgba(1, 12, 5, 0.97);
+}
+
+body.agent-vision-active .signal-trial__chamber {
+  box-shadow:
+    0 0 80px rgba(0, 255, 102, 0.45),
+    inset 0 0 40px rgba(0, 255, 102, 0.08);
+  animation: stChamberThrum 4s ease-in-out infinite;
+}
+
+@keyframes stChamberThrum {
+  0%, 100% { box-shadow: 0 0 60px rgba(0, 255, 102, 0.4), inset 0 0 40px rgba(0, 255, 102, 0.06); }
+  50% { box-shadow: 0 0 100px rgba(0, 255, 102, 0.55), inset 0 0 60px rgba(0, 255, 102, 0.12); }
+}
+
+/* Mobile tweaks */
+@media (max-width: 560px) {
+  .signal-trial__chamber {
+    padding: 1.5rem 1.2rem;
+  }
+  .signal-trial__meter {
+    grid-template-columns: 92px 1fr 38px;
+    font-size: 0.66rem;
+  }
+  .signal-trial__lines {
+    font-size: 0.78rem;
+    min-height: 8rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .signal-trial,
+  .signal-trial__lines li,
+  .signal-trial__meter-fill,
+  .signal-trial__verdict,
+  .signal-trial__cta {
+    transition: none;
+    animation: none;
+  }
+  .signal-trial__cta.is-ready {
+    animation: none;
+  }
+  body.agent-vision-active .signal-trial__chamber {
+    animation: none;
+  }
+  .signal-trial__verdict.is-glitching .signal-trial__verdict-text {
+    animation: none;
+  }
+}
