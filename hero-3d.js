@@ -125,8 +125,16 @@ function initHero3D() {
   // model has arrived yet.
   // -------------------------------------------------------------
   const handsContainer = new THREE.Group();
-  const HANDS_BASE_Y = -0.3;
-  handsContainer.position.y = HANDS_BASE_Y;
+  function getHandsBaseY() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    if (width <= 560) return -1.52;
+    if (width <= 820) return -1.28;
+    if (height <= 760) return -1.08;
+    return -0.98;
+  }
+  let handsBaseY = getHandsBaseY();
+  handsContainer.position.y = handsBaseY;
   scene.add(handsContainer);
 
   // -------------------------------------------------------------
@@ -243,7 +251,7 @@ function initHero3D() {
     const t = clock.getElapsedTime();
 
     // Hover float — the container moves up/down gently
-    handsContainer.position.y = HANDS_BASE_Y + Math.sin(t * 0.7) * 0.12;
+    handsContainer.position.y = handsBaseY + Math.sin(t * 0.7) * 0.12;
 
     // Subtle breath scale on the container
     const breath = 1 + Math.sin(t * 0.6) * 0.012;
@@ -278,6 +286,9 @@ function initHero3D() {
       camera.updateProjectionMatrix();
       renderer.setSize(w, h, false);
     }
+    handsBaseY = getHandsBaseY();
+    handsContainer.position.y = handsBaseY;
+    renderFrame();
   }
   window.addEventListener("resize", resize);
   resize();
